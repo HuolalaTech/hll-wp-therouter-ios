@@ -18,6 +18,9 @@ DerivedData
 *.hmap
 *.ipa
 
+PodPushFile
+specpush.rb
+
 # Bundler
 .bundle
 
