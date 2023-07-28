@@ -14,7 +14,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    [TheRouter.shared registPathAnnotationsWithHost:@"hd://com.therouter.test"];
+    [TheRouter.shared registPathAnnotationsWithHost:@"demo://therouter.com"];
     return YES;
 }
 
