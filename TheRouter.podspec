@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TheRouter'
-  s.version          = '1.0.0-rc.2'
+  s.version          = '1.0.0-rc.3'
   s.summary          = 'An iOS lightweight route that supports annotations'
 
 # This description is used to generate tags and improve search results.
