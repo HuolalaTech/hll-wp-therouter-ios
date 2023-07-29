@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TheRouter'
-  s.version          = '1.0.0'
+  s.version          = '0.0.1'
   s.summary          = 'An iOS lightweight route that supports annotations'
 
 # This description is used to generate tags and improve search results.
@@ -25,7 +25,7 @@ TODO: Add long description of the pod here.
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'zed' => 'zed.wang' }
-  s.source           = { :git => '', :tag => s.version.to_s }
+  s.source           = { :git => 'git@github.com:HuolalaTech/hll-wp-therouter-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '10.0'
