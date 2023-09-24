@@ -4,149 +4,653 @@
 
 [![**license**](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![**Platform**](https://img.shields.io/badge/platform-iOS-blue.svg)]()
-[![**Language**](https://img.shields.io/badge/language-ObjectC-green.svg)]()
-[![**wiki**](https://img.shields.io/badge/Wiki-open-brightgreen.svg)](https://xxx.com)
+[![**Language**](https://img.shields.io/badge/language-Swift-orange.svg)]()
+[![**wiki**](https://img.shields.io/badge/Wiki-open-brightgreen.svg)](https://juejin.cn/user/1768489241815070)
 
-## 功能介绍
+## 背景
+  1. 随着社区对支持Swift的需求日益增多，Swift5.0二进制库也具有更好的稳定性和兼容性表现，货拉拉技术团队根据社区反馈及内部讨论，决定开源内部业务使用的Swift版本路由组件，与2023年8月份已发布的Objective-C版本路由组件组成一个完整解决方案。
+  2. TheRouter开源团队将把重心放在维护和升级Swift版本的TheRouter上。同时也会持续支持Objective-C版本的易用性，并欢迎社区贡献。
+  3. 对于使用Objective-C版本TheRouter的用户，建议将版本固定为1.0.0版以确保稳定性。
+## Features
+  TheRouter一个用于模块间解耦和通信，基于Swift协议进行动态懒加载注册路由与打开路由的工具。同时支持通过Service-Protocol寻找对应的模块，并用 protocol进行依赖注入和模块通信。
+* **1. 页面导航跳转能力**：支持常规vc或Storyboard的push/present/popToTaget/windowNavRoot/modalDismissBeforePush跳转能力；
+* **2. 路由自动注册能力**：懒加载方式动态注册路由，仅当第一次调用OpenURL时进行动态注册；
+* **3. 路由映射文件导出**：支持将工程中的路由映射关系导出为文档，支持JSON、Plist格式，方便开发者进行双端的汇总比对、记录等；
+* **4. 服务自动注册能力**：动态注册服务，使用runtime方式自动注入；
+* **5. 硬编码消除**：将注册的path转为静态字符串常量供业务使用；
+* **6. 动态化能力**：支持添加重定向，移除重定向、动态添加路由、动态移除路由、拦截器、错误path修复等；
+* **7. 链式编程**：支持链式编程方式拼接URL与参数；
+* **8. 适配Objective-C**：OC类可以在Swift中使用继承的方式遵循协议来进行动态注册；
+* **9. 服务调用**：支持本地服务调用与远端服务调用；
 
-TheRouter是货拉拉打造的一款同时支持[Android](https://github.com/HuolalaTech/hll-wp-therouter-android)及iOS的轻量级路由中间件，在iOS端吸取了其他其他语言的特性，支持[注解](https://juejin.cn/post/6999484997782470669)功能，极大提升了路由在iOS端的使用体感。摒弃了传统ioser的target-action或protocol理念，向更广的后台或Android应用对齐。
+| 功能序号 | 功能描述 | 事例代码及注释 |
+|:----|:---:|:---:|
+| 1 | 懒加载路由 | lazyRegisterRouterHandle  仅当第一次调用OpenURL时进行动态注册|
+| 2 | 发挥Swift特性，面向协议编程 | TheRouterServiceProtocol TheRouterableProtocol |
+| 3 | 动态注册，无需手动注册 | TheRouterManager.addGloableRouter([".LA"], url, userInfo) |
+| 4 | 支持依赖注入与服务的自动注册 | TheRouter.registerServices()  TheRouterServiceManager.registerService(serviceName)|
+| 5 | 服务的动态注册与协议方式调用| TheRouter.fetchService(AppConfigServiceProtocol.self) |
+| 6 | 支持单模块独立初始化| ModuleProtocol moduleSetUp() |
+| 7 | 支持路由映射文件导出 | TheRouter.writeRouterMapToFile |
+| 8 | 支持重定向，移除重定向、动态添加路由、动态移除路由，错误path修复 | TheRouter.addRelocationHandle |
+| 9 | 支持拦截器 | TheRouter.addRouterInterceptor |
+| 10 | 支持Swift项目中调用OC路由 | OC类可以在Swift中使用继承的方式遵循协议来进行动态注册 |
+| 11 | 支持全局失败监控 | TheRouter.globalOpenFailedHandler  |
+| 12 | 支持路由与服务日志回调 | TheRouter.logcat(_ url: String, _ logType: TheRouterLogType, _ errorMsg: String)  |
+| 13 | 支持路由注册期的安全检查 | TheRouterManager.routerForceRecheck()  客户端强制校验，是否匹配,不匹配触发断言|
+| 14 | 支持后端对客户端服务的调用 | TheRouter.openURL() 服务接口下发，MQTT,JSBridge|
+| 15 | 支持链式调用 | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation() |
+| 16 | 支持链式调用打开路由回调闭包 | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation(_ complateHandler: ComplateHandler = nil) |
+| 17 | 支持非链式调用打开路由回调闭包 | TheRouter.openURL("https://therouter.cn/" ) { param, instance in } |
+# 背景
+随着项目需求的日益增加，开发人员的不断增加，带来了很多问题：
 
-`TheRouter 核心功能具备四大能力：`
+- 模块划分不清晰，任何开发人员随意调用并修改其他模块的代码实现以满足自己的业务需求。
 
-* **页面导航跳转能力**：支持常规vc或Storyboard的push/present跳转能力；
-* **自动注册能力**：实现类似Java注解功能，在vc类或任意方法上标注即可完成路由注册；
-* **硬编码消除**：内置脚本会自动将注册的path转为静态字符串常量供业务使用；
-* **动态化能力**：支持添加重定向、拦截器等等；
+- 维护困难，同一组件的不同服务，散落在工程各个地方，不利于统一维护修改替换。
 
-## 模块描述
+- 模块负责人无法清晰，导致同一功能多人维护，造成冲突。
 
-```
-.
-├── Classes
-│   ├── TheRouter+Annotation.h
-│   ├── TheRouter+Annotation.m  // 路由注解器及Path功能扩展
-│   ├── TheRouter.h
-│   └── TheRouter.m             // 路由库核心代码（增删改查，重定向/拦截器）
-└── Resources
-    └── scan.py                 // 注解扫描及硬编码处理脚本（该脚本只会被引用不会参与编译和打包）
-```
+<img src="assets/project.png">
 
-## 使用介绍
+另外件拆分完之后都上升到远端，那么它们之间本地的代码是没办法相互依赖的，所以就需要通过一种工具，然后去实现透传服务的能力。我们需要一个中间件去处理这些问题。路由即是将耦合进行转移，通过增加中间层映射关系，解决业务之间的依赖关系。
 
-#### Cocoapods 引入
+## 一个成熟的路由该是什么样子
+
+**1.**  业务组件化之后，组件化需要将整个项目的各个模块进行解耦，升级远端之后，界面之间的跳转怎么解决？**路由 Api**
+
+**2.**  动态注册路由，无需手动注册。服务的动态注册，无需手动注册。
+
+**3.**  端上跳转统一问题怎么解决？**使用统一 URL 映射方式处理**
+
+**4.**  业务跳转中出现问题，如何修改跳转逻辑？服务如何降级? **远端下发配置，修改跳转 URL**
+
+**5.**  业务服务异常，界面改为 h5 界面。**重定向**
+
+**6.**  App 跳转出现问题如何跳转到同一个本地的 error 界面？**统一失败处理**
+
+**7.**  如何在跳转前增加强制的业务逻辑处理，比如业务调整，必须先执行某些操作，才能进入。**重定向**
+
+**8.**  业务中有很多需要前置跳转，比如先登录才能去订单列表，如何实现。**拦截器**
+
+**9.**  如何测试各个跳转业务是否正常。 **路由 Path 校验**
+
+**10.** 如何把最频繁的业务跳转前置，减少查询次数？**增加优先级 priority**
+
+**11.** 本地服务通过路由调用，远端服务通过路由调用 **支持服务调用**
+
+## 整体设计思路
+
+为了和Android端保持一致，使用了URL，class注册的方式实现。通过URL匹配方式查询数组中保存的模版信息，找到执行获取对应实例，执行跳转操作。
+
+<img src="assets/TheRouter.png">
+
+## 使用介绍预览
+
+<img src="assets/ScreenRecording.gif">
+
+## 如何集成使用
+
+### [CocoaPods](https://cocoapods.org)
+Add the following entry in your Podfile:
 
 ```ruby
-pod 'TheRouter'
+   pod 'TheRouter', '0.1.0'
 ```
 
-#### 注解使用
+## Swift限制版本
 
-**step1**
-
-创建`TheRouterAnnotation.plist`文件，必须在MainBundle下。
-
-**step2**
-
-为项目创建一个Aggregate类型的target：
-
-<img src="GuideImages/guide1.jpeg">
-
-**step3**
-
-在新建的target添加脚本：
-
-<img src="GuideImages/guide2.jpeg">
-
-图中实例脚本参数含义：
-
-```shell
-python3 $SRCROOT/../TheRouter/Resources/scan.py     # 脚本路径
-$SRCROOT/                                           # 参数1：扫描路径,一般为项目根目录
-$SRCROOT/TheRouter/                                 # 参数2：路径定义头文件存放目录 一般为存放至公共模块 
-$SRCROOT/TheRouter/TheRouterAnnotation.plist        # 参数3：TheRouterAnnotation文件路径
+```ruby
+ Swift5.0 or above
 ```
 
-**step4**
+## TheRouter 使用方式
 
-在应用加载完成时注册host，在想要跳转的VC类上添加路由注解或创建对应模块的Service类，在Service中的方法上添加注解即可，例如：
+1.  ### 注册
 
-注册该项目的host：
+ 鉴于已经实现了自动注册能力，开发者无需自己添加路由，只需要进行如下操作即可
 
-```
-[TheRouter.shared registPathAnnotationsWithHost:@"hd://com.therouter.test"];
-```
-
-添加vc注解：
-
-```
-TheRouterController(test/vc, TestViewController)
-@interface TestViewController : UIViewController
-
-@end
-```
-
-添加Service注解：
-
-```
-#import "TestService.h"
-#import "TheRouter_Mappings.h"
-#import <TheRouter/TheRouter+Annotation.h>
-
-@implementation TestService
-
-TheRouterSelector(test/jump, jumpToTestVC, TestService)
-+ (id)jumpToTestVC:(TheRouterInfo *)routerInfo
-{
-    UIViewController *vc = [TheRouter.shared openVCPath:kRouterPathTestVcVC
-                                                    cmd:TheRouterOpenCMDPush
-                                             withParams:@{@"title":@"123"}
-                                                hanlder:^(NSString * _Nonnull tag, NSDictionary * _Nullable result) {
-        !routerInfo.openCompleteHandler ?: routerInfo.openCompleteHandler(tag, result);
-    }];
-    return vc;
+```Swift
+/// 实现TheRouterable协议
+extension TheRouterController: TheRouterable {
+    
+    static var patternString: [String] {
+        ["scheme://router/demo"]
+    }
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        debugPrint(info)
+        
+        let vc =  TheRouterController()
+        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
+        vc.resultLabel.text = info.description
+        return vc
+    }
 }
 
+/// 在AppDelegate中实现懒加载的闭包
+// 路由懒加载注册
+TheRouter.lazyRegisterRouterHandle { url, userInfo in
+    TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
+    return TheRouterManager.addGloableRouter([".The"], url, userInfo)
+}
+
+// 动态注册服务
+TheRouterManager.registerServices()
+
+// 日志回调，可以监控线上路由运行情况
+TheRouter.logcat { url, logType, errorMsg in
+    debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
+}
+```
+
+#### OC 注解的形式
+
+ 这里列举了OC使用注解的方式，Swift因为其缺乏动态性，是不支持注解的。
+ 
+```Objective-C
+//使用注解
+@page(@"home/main")
+- (UIViewController *)homePage{
+    // Do stuff...
+}
+```
+
+#### Swift 注册形式
+ 
+Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注册路由该怎么解决呢，我们使用 runtime 遍历工程里的方式找到遵循了路由协议的类进行自动注册。
+
+```Swift
+public class func registerRouterMap(_ registerClassPrifxArray: [String], _ urlPath: String, _ userInfo: [String: Any]) -> Any? {
+        
+        let expectedClassCount = objc_getClassList(nil, 0)
+        let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
+        let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
+        let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
+        
+        var resultXLClass = [AnyClass]()
+        for i in 0 ..< actualClassCount {
+            
+            let currentClass: AnyClass = allClasses[Int(i)]
+            let fullClassName: String = NSStringFromClass(currentClass.self)
+            
+            for value in registerClassPrifxArray {
+                if (fullClassName.containsSubString(substring: value))  {
+                    if currentClass is UIViewController.Type {
+                        resultXLClass.append(currentClass)
+                    }
+                    
+    #if DEBUG
+                    if let clss = currentClass as? CustomRouterInfo.Type {
+                        assert(clss.patternString.hasPrefix("scheme://"), "URL非scheme://开头，请重新确认")
+                        apiArray.append(clss.patternString)
+                        classMapArray.append(clss.routerClass)
+                    }
+    #endif
+                }
+            }
+        }
+        
+        for i in 0 ..< resultXLClass.count {
+            let currentClass: AnyClass = resultXLClass[i]
+            if let cls = currentClass as? TheRouterable.Type {
+                let fullName: String = NSStringFromClass(currentClass.self)
+               
+                for s in 0 ..< cls.patternString.count {
+                    
+                    if fullName.hasPrefix(NSKVONotifyingPrefix) {
+                        let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
+                        let subString = fullName[range]
+                        pagePathMap[cls.patternString[s]] = "\(subString)"
+                        TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
+                    } else {
+                        pagePathMap[cls.patternString[s]] = fullName
+                        TheRouter.addRouterItem(cls.patternString[s], classString: fullName)
+                    }
+                }
+            }
+        }
+        
+#if DEBUG
+        debugPrint(pagePathMap)
+        routerForceRecheck()
+#endif
+        TheRouter.routerLoadStatus(true)
+        return TheRouter.openURL(urlPath, userInfo: userInfo)
+}
+```
+
+为了避免无效遍历，我们通过传入 registerClassPrifxArray 指定我们遍历包含这些前缀的类即可。一旦是 UIViewController.Type 类型就进行存储，然后再进行校验是否遵循 TheRouterable 协议，遵循则自动注册。无需手动注册。
+
+#### 路由注册的懒加载
+
+采用动态注册有一个不好的情况就是在启动时就去动态注册，在 TheRouter 中注册的时机被延后了，放在了 App 第一次通过 TheRouter.openUrl()时进行注册，会判断路由是否加载完毕，未加载完毕进行加载，然后打开路由。
+
+```Swift
+@discardableResult
+public class func openURL(_ urlString: String, userInfo: [String: Any] = [String: Any](), handler: complateHandler = nil) -> Any? {
+    if urlString.isEmpty {
+        return nil
+    }
+    if !shareInstance.isLoaded {
+        return shareInstance.lazyRegisterHandleBlock?(urlString, userInfo)
+    } else {
+       return openCacheRouter((urlString, userInfo))
+    }
+}
+
+// MARK: - Public method
+@discardableResult
+public class func openURL(_ uriTuple: (String, [String: Any]), handler: complateHandler = nil) -> Any? {
+    if !shareInstance.isLoaded {
+        return shareInstance.lazyRegisterHandleBlock?(uriTuple.0, uriTuple.1)
+    } else {
+        return openCacheRouter(uriTuple)
+    }
+}
+
+public class func openCacheRouter(_ uriTuple: (String, [String: Any]), handler: complateHandler = nil) -> Any? {
+
+    if uriTuple.0.isEmpty {
+        return nil
+    }
+
+    if uriTuple.0.contains(shareInstance.serviceHost) {
+        return routerService(uriTuple)
+    } else {
+        return routerJump(uriTuple)
+    }
+}
+```
+
+#### 如何让 OC 类也享受到 Swift 路由
+
+这是一个 OC 类的界面，实现路由的跳转需要继承 OC 类，并实现 TheRouterAble 协议即可
+
+```Swift
+@interface TheRouterBController : UIViewController
+@property (nonatomic, strong) UILabel *desLabel;
 @end
 
+@interface TheRouterBController ()
+
+@end
+
+@implementation TheRouterBController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor yellowColor];
+    [self.view addSubview:self.desLabel];
+    // Do any additional setup after loading the view.
+}
+@end
+
+public class TheRouterControllerB: TheRouterBController, TheRouterable {
+
+    public static var patternString: [String] {
+        ["scheme://router/demo2",
+         "scheme://router/demo2-Android"]
+    }
+    
+    public static var descriptions: String {
+        "TheRouterControllerDemo"
+    }
+
+    public static func registerAction(info: [String : Any]) -> Any {
+        let vc =  TheRouterBController()
+        vc.desLabel.text = info.description
+        return vc
+    }
+}
 ```
 
-**step5**
+#### 同时支持手动单个注册
 
-在每次对路由进行增删改时编译一次创建好的target，会自动向`TheRouterAnnotation.plist`文件写入信息，并在指定的目录下生成`TheRouter_Mappings.h`文件，将此文件拖入对应模块即可
-
-<img src="GuideImages/guide3.jpeg">
-
-#### 拦截器和重定向
-
-**拦截器：**
-
-```
-// 只要访问hd://com.therouter.test或其子路径 (hd://com.therouter.test/xxx) 都会进入该回调
-// 如果返回YES那么对应的路由事件可以正常执行，反之则会被拦截不会执行路由事件
-[TheRouter.shared registInterceptorForURLString:@"hd://com.therouter.test/*" handler:^BOOL(TheRouterInfo * _Nonnull router, id  _Nullable (^ _Nonnull continueHandle)(void)) {
-    NSLog(@"will execute router %@", router.URLString);
-    return YES;
-}];
+```Swift
+// 模型模式
+TheRouter.addRouterItem(RouteItem(path: "scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可", className: "TheRouter_Example.TheRouterController", desc: "简单注册,直接调用TheRouter", params: ["key1": 1]))
+// 字典模式
+TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController"])
+// 常量参数模式
+TheRouter.addRouterItem("scheme://router/demo?&desc=简单注册", classString: "TheRouter_Example.TheRouterController")
+// 协议模式， TheRouterApi实现了 CustomRouterInfo协议
+TheRouter.addRouterItem(TheRouterApi.patternString, classString: TheRouterApi.routerClass)
 ```
 
-**重定向：**
+#### 同时支持手动批量注册
 
-```
-// 重定向是指访问 hd://test.com/test 时会走 hd://test.com/test/vc的事件，用来迁移老路径或线上遇到问题时可快速更改至其他页面承接业务
-[TheRouter.shared registRedirect:@"hd://test.com/test" to:@"hd://test.com/test/vc"];
-```
-
-#### 执行路由事件
-
-```
-UIViewController *vc = [TheRouter.shared openVCPath:kRouterPathTestVcVC    // 传入Path
-                                                cmd:TheRouterOpenCMDPush   // 指定打开命令
-                                         withParams:@{@"title":@"123"}     // 指定参数，这里支持对kvc赋值
-                                            hanlder:^(NSString * _Nonnull tag, NSDictionary * _Nullable result) {
-        !routerInfo.openCompleteHandler ?: routerInfo.openCompleteHandler(tag, result);
-}];
+```Swift
+TheRouter.addRouterItem(["scheme://router/demo": "TheRouter_Example.TheRouterController",
+                    "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
 ```
 
+### 移除
+
+```Swift
+TheRouter.removeRouter(TheRouterViewCApi.patternString)
+```
+
+### 打开
+
+声明了不同的方法，主要用于明显的区分，内部统一调用 openURL
+
+便利构造器链式打开路由
+
+```Swift
+let model = TheRouterModel.init(name: "AKyS", age: 18)
+TheRouterBuilder.build("scheme://router/demo")
+    .withInt(key: "intValue", value: 2)
+    .withString(key: "stringValue", value: "2222")
+    .withFloat(key: "floatValue", value: 3.1415)
+    .withBool(key: "boolValue", value: false)
+    .withDouble(key: "doubleValue", value: 2.0)
+    .withAny(key: "any", value: model)
+    .navigation()
+    
+TheRouterBuilder.build("scheme://router/demo")
+.withInt(key: "intValue", value: 2)
+.withString(key: "stringValue", value: "sdsd")
+.withFloat(key: "floatValue", value: 3.1415)
+.withBool(key: "boolValue", value: false)
+.withDouble(key: "doubleValue", value: 2.0)
+.withAny(key: "any", value: model)
+.navigation { params, instance in
+    
+}
+    
+```
+
+打开路由常用方式
+
+```Swift
+public class TheRouterApi: CustomRouterInfo {
+
+    public static var patternString = "scheme://router/demo"
+    public static var routerClass = "TheRouter_Example.TheRouterController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+
+    public init() {}
+}
+
+public class TheRouterAApi: CustomRouterInfo {
+
+    public static var patternString = "scheme://router/demo1"
+    public static var routerClass = "TheRouter_Example.TheRouterControllerA"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+
+    public init() {}
+}
+
+TheRouter.openURL(TheRouterCApi.init().requiredURL)
+TheRouter.openWebURL("https://xxxxxxxx")
+```
+
+```Swift
+
+@discardableResult
+public class func openWebURL(_ uriTuple: (String, [String: Any])) -> Any? {
+    return TheRouter.openURL(uriTuple)
+}
+
+@discardableResult
+public class func openWebURL(_ urlString: String,
+                             userInfo: [String: Any] = [String: Any]()) -> Any? {
+    TheRouter.openURL((urlString, userInfo))
+}
+```
+
+元祖形式传入路由与追加参数
+
+```Swift
+TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册，动态注册，懒加载动态注册", ["descs": "追加参数"]))
+```
+
+参数传递方式
+
+```Swift
+let clouse = { (qrResult: String, qrStatus: Bool) in
+    print("\(qrResult) \(qrStatus)")
+    self.view.makeToast("\(qrResult) \(qrStatus)")
+}
+let model = TheRouterModel.init(name: "AKyS", age: 18)
+TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS", ["model": model, "clouse": clouse]))
+```
+
+### 全局失败映射
+
+```Swift
+TheRouter.globalOpenFailedHandler { info in
+   debugPrint(info)
+}
+```
+
+### 拦截
+
+比如在未登录情况下统一拦截：跳转消息列表之前先去登录，登录成功之后跳转到消息列表等。
+
+```Swift
+let login = TheRouterLoginApi.templateString
+ TheRouter.addRouterInterceptor([login], priority: 0) { (info) -> Bool in
+       if LALoginManger.shared.isLogin {
+             return true
+       } else {
+             TheRouter.openURL(TheRouterLoginApi().build)
+             return false
+       }
+ }
+```
+
+登录成功之后删除拦截器即可。
+
+
+### 路由 Path 与类正确安全校验
+
+```Swift
+// MARK: - 客户端强制校验，是否匹配
+public static func routerForceRecheck() {
+    let patternArray = Set(pagePathMap.keys)
+    let apiPathArray = Set(apiArray)
+    let diffArray = patternArray.symmetricDifference(apiPathArray)
+    debugPrint("URL差集：\(diffArray)")
+    debugPrint("pagePathMap：\(pagePathMap)")
+    assert(diffArray.count == 0, "URL 拼写错误，请确认差集中的url是否匹配")
+
+    let patternValueArray = Set(pagePathMap.values)
+    let classPathArray = Set(classMapArray)
+    let diffClassesArray = patternValueArray.symmetricDifference(classPathArray)
+    debugPrint("classes差集：\(diffClassesArray)")
+    assert(diffClassesArray.count == 0, "classes 拼写错误，请确认差集中的class是否匹配")
+}
+```
+
+### 踩坑路由注册-KVO
+
+在进行 classes 本地校验时遇到了类名不匹配问题。
+
+排查原因： 是因为为了避免路由在启动时就注册，影响启动速度，采用了懒加载的方式即第一次打开路由界面的时候才先进行注册然后跳转。但是在我们动态注册之前，某个类因为添加了 KVO (Key-Value Observing 键值监听)，这个类在遍历时 className 修改为了 NSKVONotifying_xxx。需要我们进行特殊处理，如下
+
+```Swift
+/// 对于KVO监听，动态创建子类，需要特殊处理
+public let NSKVONotifyingPrefix = "NSKVONotifying_"
+
+if fullName.hasPrefix(NSKVONotifyingPrefix) {
+    let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
+    let subString = fullName[range]
+    pagePathMap[cls.patternString[s]] = "\(subString)"
+    TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
+}
+```
+
+## 动态调用路由
+
+在之上的路由能力下，我们希望 App 能够支持动态增加路由，删除路由，重定向路由、通过路由调起本地服务、远端通过路由调起 App 服务能力，随即进行了动态化的扩展。
+
+### 重定向功能
+定义路由下发模型数据结构
+
+```Swift
+public struct TheRouterInfo {
+    public init() {}
+    
+    public var targetPath: String = ""
+    public var orginPath: String = ""
+    // 1: 表示替换或者修复客户端代码path错误 2: 新增路由path 3:删除路由
+    public var routerType: TheRouterReloadMapEnum = .none 
+    public var path: String = "" // 新的路由地址
+    public var className: String = "" // 路由地址对应的界面
+    public var params: [String: Any] = [:]
+}
+```
+
+通过远端下发重定向数据，原本跳转到白色界面的业务逻辑改为跳转到黄色界面
+
+```Swift
+let relocationMap = ["routerType": 1, "targetPath": "scheme://router/demo1", "orginPath": "scheme://router/demo"] as NSDictionary
+TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
+TheRouter.openURL("scheme://router/demo?desc=跳转白色界面被重定向到了黄色界面")
+```
+
+### 重定向恢复
+
+在业务中，通常会进行业务调整，那么重定向之后需要恢复的话，就需要移除重定向
+
+```Swift
+let relocationMap = ["routerType": 4, "targetPath": "scheme://router/demo", "orginPath": "scheme://router/demo"] as NSDictionary
+TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
+TheRouter.openURL("scheme://router/demo?desc=跳转白色界面被重定向到了黄色界面之后，根据下发数据又恢复到跳转白色界面")
+```
+
+### 路由 Path 动态修复
+
+在实际开发中，开发人员因为马虎写错了路由 Path，上线之后无法进行正常的业务跳转，此时就需要通过远端下发路由进行匹配跳转了。scheme://router/demo3 是正确 path,但是本地写错的路由 path 为 scheme://router/demo33，那么需要新增一个 path 进行映射。
+
+```Swift
+let relocationMap = ["routerType": 2, "className": "TheRouter_Example.TheRouterControllerC", "path": "scheme://router/demo33"] as NSDictionary
+TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
+let value = TheRouterCApi.init().requiredURL
+TheRouter.openURL(value)
+```
+
+### 路由适配不同的 Android-Path
+
+在实际开发中，一旦使用 URI 这种方式，牵扯到双端，就可以存在双端不一致的问题，那么如何解决呢，可以通过本地新增多路由 path 解决，也可以通过远端下发新路由解决。
+
+```Swift
+public class TheRouterControllerB: TheRouterBController, TheRouterable {
+
+    public static var patternString: [String] {
+        ["scheme://router/demo2",
+         "scheme://router/demo2Android"]
+    }
+
+    public static func registerAction(info: [String : Any]) -> Any {
+        let vc =  TheRouterBController()
+        vc.desLabel.text = info.description
+        return vc
+    }
+}
+```
+
+```Swift
+let relocationMap = ["routerType": 2, "className": "TheRouter_Example.TheRouterControllerD", "path": "scheme://router/demo5"] as NSDictionary
+TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
+TheRouter.openURL("scheme://router/demo2Android?desc=demo5是Android一个界面的path,为了双端统一，我们动态增加一个path,这样远端下发时demo5也就能跳转了")
+
+```
+
+## 服务的动态注册与调用
+
+### 如何声明服务及实现服务
+
+```Swift
+@objc
+public protocol AppConfigServiceProtocol: TheRouterServiceProtocol {
+    // 打开小程序
+    func openMiniProgram(info: [String: Any])
+}
+
+final class ConfigModuleService: NSObject, AppConfigServiceProtocol {
+    
+    static var seriverName: String {
+        String(describing: AppConfigServiceProtocol.self)
+    }
+    
+    func openMiniProgram(info: [String : Any]) {
+        if let window = UIApplication.shared.delegate?.window {
+            window?.makeToast("打开微信小程序", duration: 1, position: window?.center)
+        }
+    }
+}
+
+
+```
+### 如何使用服务
+
+```Swift
+/// 使用方式
+ if let appConfigService = TheRouter.fetchService(AppConfigServiceProtocol.self){
+     appConfigService.openMiniProgram(info: [:])
+}
+```
+
+ 服务使用了runtime动态注册，所以你不用担心服务没有注册的问题。只需像上述案例一样使用即可。
+ 
+```Swift
+public class func registerServices() {
+    
+    let expectedClassCount = objc_getClassList(nil, 0)
+    let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
+    let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
+    let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
+    var resultXLClass = [AnyClass]()
+    for i in 0 ..< actualClassCount {
+        
+        let currentClass: AnyClass = allClasses[Int(i)]
+        if (class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil),
+           (class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil),
+           let cls = currentClass as? TheRouterServiceProtocol.Type {
+            print(currentClass)
+            resultXLClass.append(cls)
+            
+            TheRouterServiceManager.default.registerService(named: cls.seriverName, lazyCreator: (cls as! NSObject.Type).init())
+        }
+    }
+}
+```
+
+### 路由远端调用本地服务：服务接口下发，MQTT,JSBridge
+
+```Swift
+let dict = ["ivar1": ["key":"value"]]
+let url = "scheme://services?protocol=AppConfigLAServiceProtocol&method=openMiniProgramWithInfo:&resultType=0"
+TheRouter.openURL((url, dict))
+```
+
+## 是否考虑Swift5.9 Macros？
+
+ 从目前的实现方式来看，懒加载加上动态注册，已经解决了注册时的性能问题。即使需要遍历全工程的类，然后处理相关逻辑，也不会超过0.2s。之所以能够通过Class取得path，因为给类声明了静态变量。
+ 
+```Swift
+/// 实现TheRouterable协议
+extension TheRouterController: TheRouterable {
+    
+    static var patternString: [String] {
+        ["scheme://router/demo"]
+    }
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        debugPrint(info)
+        
+        let vc =  TheRouterController()
+        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
+        vc.resultLabel.text = info.description
+        return vc
+    }
+}
+```
 ## 关于作者
 
 [货拉拉移动端技术团队](https://juejin.cn/user/1768489241815070)

@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TheRouter'
-  s.version          = '1.0.0'
-  s.summary          = 'An iOS lightweight route that supports annotations'
+  s.version          = '1.1.0'
+  s.summary          = 'TheRouter一个用于模块间解耦和通信，基于Swift协议进行动态懒加载注册路由与打开路由的工具。同时支持通过Service-Protocol寻找对应的模块，并用 protocol进行依赖注入和模块通信。'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -22,16 +22,19 @@ TODO: Add long description of the pod here.
                        DESC
 
   s.homepage         = 'https://github.com/HuolalaTech/therouter-ios'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'zed' => 'zed.wang' }
+  s.author           = { 'mars' => 'mars.yao' }
   s.source           = { :git => 'git@github.com:HuolalaTech/hll-wp-therouter-ios.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source_files = 'TheRouter/Classes/**/*'
+  s.frameworks = 'UIKit', 'Foundation'
+  s.ios.deployment_target = '11.0'
+  # swift 支持的版本
+  s.swift_version = '5.0'
+  s.static_framework = true
+  s.xcconfig = {"ENABLE_BITCODE" => "NO"}
+  s.pod_target_xcconfig = {
+    'OTHER_SWIFT_FLAGS[config=Debug]' => '-D DEBUG'
+  }
 
-  s.ios.deployment_target = '10.0'
-
-  s.source_files = 'TheRouter/Classes/*.{h,m}'
-  s.preserve_paths = 'TheRouter/Resources/scan.py'
-  s.public_header_files = 'TheRouter/Classes/*.h'
-  
 end
+

@@ -4,151 +4,691 @@
 
 [![**license**](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![**Platform**](https://img.shields.io/badge/platform-iOS-blue.svg)]()
-[![**Language**](https://img.shields.io/badge/language-ObjectC-green.svg)]()
+[![**Language**](https://img.shields.io/badge/language-Swift-orange.svg)]()
 [![**wiki**](https://img.shields.io/badge/Wiki-open-brightgreen.svg)](https://xxx.com)
 
-> [中文文档](README_CN.md)
+> [Chinese Documentation](README_CN.md)
+
+## Background
+
+1. With the increasing demand from the community to support Swift, the Swift 5.0 binary library also has better stability and compatibility performance. Based on community feedback and internal discussions, the Huolala technical team has decided to use the Swift version routing component for open source internal business, which will form a complete iOS solution with the Objective-C version routing component released in August 2023.
+
+2. The TheRouter open-source team will focus on maintaining and upgrading the Swift version of TheRouter. At the same time, it will continue to support the ease of use of the Objective-C version, and welcomes community contributions.
+
+3. For users using the Objective-C version of The Router, it is recommended to fix the version to version 1.0.0 to ensure stability.
 
 ## Features
 
-TheRouter is a product of the same support [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) and iOS lightweight routing middleware, the iOS side absorbs other language features, support [Annotation](https://juejin.cn/post/6999484997782470669) function, It greatly improves the feel of using routes in iOS. Instead of the traditional ioser target-action or protocol concept, it is aligned to the broader background or Android application.
+TheRouter: A tool for decoupling and communication between modules, registering routes and opening routes based on the Swift protocol for dynamic lazy loading. 
+In addition, it supports finding corresponding modules through Service-Protocol, and using protocol for dependency injection and module communication.
 
-`TheRouter core functions have four major capabilities:`
+* **1. Page navigation jump ability:**  support regular vc or Storyboard push/present/popToTaget/windowNavRoot/modalDismissBeforePush jump ability;
+* **2. Automatic registration router capability:**  Lazy load dynamic registration route, only when the first call OpenURL dynamic registration;
+* **3. Export Route Mapping File:** Support exporting the routing mapping relationships in the project as documents, support JSON and Plist formats, and facilitate developers to perform dual end summary, comparison, and recording;
+* **4. Automatic registration services capability:** dynamic registration of services, automatic injection using runtime;
+* **5. Hard-coded elimination:**  Converts the registered path to a static string constant for business use;
+* **6. Dynamic capability:**  Support to add emphasis direction, remove redirection, dynamic add route, dynamic remove route, interceptor, error path repair, etc.
+* **7. Chain programming:**  Support chain programming to concatenate urls and parameters;
+* **8. Adaptation Objective-C** : OC classes can dynamically register in Swift using inheritance to follow the protocol.
+* **9. Service call:**  Support local service call and remote service call;
 
-* **Page navigation jump ability:** support regular vc or Storyboard push/present jump ability;
-* **Automatic registration capability:** similar to Java annotation function, route registration can be completed by marking the vc class or any method;
-* **Hard-coding elimination:** Built-in scripts automatically convert registered path to static string constants for business use;
-* **Dynamic capabilities:** support for adding weights, interceptors, etc.
+| number | desc | instanceCode |
+|:----|:---:|:---:|
+| 1 | Supports Lazy loading route | lazyRegisterRouterHandle  Dynamic registration only occurs when OpenURL is first called|
+| 2 | Supports Utilize Swift features for protocol oriented programming | TheRouterServiceProtocol TheRouterableProtocol |
+| 3 | Supports Dynamic registration without manual registration | TheRouterManager.addGloableRouter([".LA"], url, userInfo) |
+| 4 | Support for dependency injection and automatic registration of services | TheRouter.registerServices()  TheRouterServiceManager.registerService(serviceName)|
+| 5 | Supports Dynamic registration and protocol invocation of services | TheRouter.fetchService(AppConfigServiceProtocol.self) |
+| 6 | Supports independent initialization of a single module | ModuleProtocol moduleSetUp() |
+| 7 | Support for exporting routing mapping files | TheRouter.writeRouterMapToFile |
+| 8 | Support redirection, remove redirection, dynamically add routes, dynamically remove routes, and fix error paths | TheRouter.addRelocationHandle |
+| 9 | Support interceptors | TheRouter.addRouterInterceptor |
+| 10 | Support calling OC route in Swift project | OC classes can be dynamically registered in Swift using inheritance to follow protocols|
+| 11 | Support for global failure monitoring | TheRouter.globalOpenFailedHandler  |
+| 12 | Support for routing and service log callback | TheRouter.logcat(_ url: String, _ logType: TheRouterLogType, _ errorMsg: String)  |
+| 13 | Support security checks during route registration period | TheRouterManager.routerForceRecheck()  Client mandatory verification, whether it matches, triggering assertion if it does not match |
+| 14 | Support backend calls to client services | TheRouter.openURL() Service interface distribution，MQTT,JSBridge|
+| 15 | Support for chain calling| TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation() |
+| 16 | Supports opening routing callback closures | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation(_ complateHandler: ComplateHandler = nil) |
+| 17 | Support non chain calling to open routing callback closures | TheRouter.openURL("https://therouter.cn/" ) { param, instance in } |
 
-## Module Description
 
-```
-.
-├── Classes
-│   ├── TheRouter+Annotation.h
-│   ├── TheRouter+Annotation.m  // Route annotator and Path functionality extension
-│   ├── TheRouter.h
-│   └── TheRouter.m             // Routing library core code (add, delete, check, redirect/interceptor)
-└── Resources
-    └── scan.py                 // Annotation scanning and hardcoded processing scripts (this script will only be referenced and will not be involved in compilation and packaging)
-```
+# Background
 
-## Introduction
+With the increasing demand of the project, the increasing number of developers has brought many problems:
 
-#### Cocoapods imported
+- The module division is not clear, and any developer will call and modify the code implementation of other modules to meet their own business needs.
+
+- Difficult maintenance. Different services of the same component are scattered in different parts of the project, which is not conducive to unified maintenance, modification and replacement.
+
+- Module owner cannot be clear, resulting in multiple maintenance of the same function, resulting in conflict.
+
+<img src="assets/project.png">
+
+After the other pieces are split up to the remote side, then the local code between them is not able to rely on each other, so it is necessary to pass a tool, and then to achieve the ability of transparent service. We need a middleware to handle these issues. Routing transfers the coupling and solves the dependency between services by adding an intermediate layer mapping relationship.
+
+What does a mature route look like
+
+1. After service componentization, each module of the whole project needs to be decoupled. After upgrading the remote end, how to solve the jump between interfaces? ``Routing Api``
+
+2. Dynamically register routes. Manual registration is not required. Dynamic registration of services without manual registration.
+
+3. What is the solution to the uphop unification problem? ``Uses unified URL mapping to process``
+
+4. If a fault occurs during service forwarding, how can I modify the service forwarding logic? How can services be degraded? ``Remote delivery configuration, modified the forward URL``
+
+5. The service is abnormal, and the h5 interface is displayed. ``Redirect``
+
+6. If the App redirection fails, how can I go to the same local error page? ``Unified failure handling``
+
+7. How to add forced business logic processing before the jump, such as service adjustment, you must perform some operations before entering. ``Redirect``
+
+8. There are a lot of pre-hops in the business, such as login before you can go to the order list. How to achieve this? ``Interceptor``
+
+9. How to test whether each forward service is normal? ``Route Path verification``
+
+10. How to put the most frequent service forward to reduce the number of queries? ``Increase priority``
+
+11. The local service is called through the route, and the remote service is called through the route ``Support service call``
+
+## Overall design idea
+
+In order to keep consistent with the Android side, the URL and class registration are used to achieve. Query the template information saved in the array by URL matching, find and obtain the corresponding instance, and perform the jump operation.
+
+<img src="assets/TheRouter.png">
+
+## Use intro preview
+
+<img src="assets/ScreenRecording.gif">
+
+## How to install
+
+### [CocoaPods](https://cocoapods.org)
+Add the following entry in your Podfile:
 
 ```ruby
-pod 'TheRouter'
+   pod 'TheRouter', '1.1.0'
 ```
 
-#### Annotation use
+## Swift Restricted version
 
-**step1**
-
-Create `TheRouterAnnotation.plist` file, must be under the MainBundle.
-
-**step2**
-
-Create a target of type Aggregate for the project:
-
-<img src="GuideImages/guide1.jpeg">
-
-**step3**
-
-Add a script to the newly created target:
-
-<img src="GuideImages/guide2.jpeg">
-
-Example script parameters:
-
-```shell
-python3 $SRCROOT/../TheRouter/Resources/scan.py     # Script path
-$SRCROOT/                                           # Parameter 1: Scan path, usually the project root
-$SRCROOT/TheRouter/                                 # Parameter 2: Path definition header file storage directory is generally stored in the public module
-$SRCROOT/TheRouter/TheRouterAnnotation.plist        # Parameter 3: TheRouterAnnotation file path
+```ruby
+ Swift5.0 or above
 ```
 
-**step4**
+## TheRouter usage
 
-When the application is loaded, register the host, add route annotation on the VC class you want to jump to, or create a Service class for the corresponding module, and add annotation on the method in the Service, for example:
+1. ### Sign up
 
-Register the project host:
+Since automatic registration capabilities have been implemented, developers do not need to add routes themselves, just do the following.
 
-```
-[TheRouter.shared registPathAnnotationsWithHost:@"hd://com.therouter.test"];
-```
-
-Add vc annotations:
-
-```
-TheRouterController(test/vc, TestViewController)
-@interface TestViewController : UIViewController
-
-@end
-```
-
-Add the Service annotation:
-
-```
-#import "TestService.h"
-#import "TheRouter_Mappings.h"
-#import <TheRouter/TheRouter+Annotation.h>
-
-@implementation TestService
-
-TheRouterSelector(test/jump, jumpToTestVC, TestService)
-+ (id)jumpToTestVC:(TheRouterInfo *)routerInfo
-{
-    UIViewController *vc = [TheRouter.shared openVCPath:kRouterPathTestVcVC
-                                                    cmd:TheRouterOpenCMDPush
-                                             withParams:@{@"title":@"123"}
-                                                hanlder:^(NSString * _Nonnull tag, NSDictionary * _Nullable result) {
-        !routerInfo.openCompleteHandler ?: routerInfo.openCompleteHandler(tag, result);
-    }];
-    return vc;
+```Swift
+/// 实现TheRouterable协议
+extension TheRouterController: TheRouterable {
+   
+   static var patternString: [String] {
+       ["scheme://router/demo"]
+   }
+   
+   static func registerAction(info: [String : Any]) -> Any {
+       debugPrint(info)
+       
+       let vc =  TheRouterController()
+       vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
+       vc.resultLabel.text = info.description
+       return vc
+   }
 }
 
+/// 在AppDelegate中实现懒加载的闭包
+// 路由懒加载注册
+TheRouter.lazyRegisterRouterHandle { url, userInfo in
+    TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
+    return TheRouterManager.addGloableRouter([".The"], url, userInfo)
+}
+
+// 动态注册服务
+TheRouterManager.registerServices()
+
+// 日志回调，可以监控线上路由运行情况
+TheRouter.logcat { url, logType, errorMsg in
+    debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
+}
+
+```
+
+ #### OC The form of the annotation
+ Here is a list of the ways OC uses annotations, which Swift does not support due to its lack of dynamism.
+
+```Swift
+//使用注解
+@page(@"home/main")
+- (UIViewController *)homePage{
+    // Do stuff...
+}
+```
+
+#### Swift registered routing
+In Swift, we all know that Swift does not support annotations, so how to solve Swift dynamic registration routing, we use the runtime traversal in the project to find a routing protocol to automatically register the class.
+
+```Swift
+public class func registerRouterMap(_ registerClassPrifxArray: [String], _ urlPath: String, _ userInfo: [String: Any]) -> Any? {
+        
+        let expectedClassCount = objc_getClassList(nil, 0)
+        let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
+        let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
+        let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
+        
+        var resultXLClass = [AnyClass]()
+        for i in 0 ..< actualClassCount {
+            
+            let currentClass: AnyClass = allClasses[Int(i)]
+            let fullClassName: String = NSStringFromClass(currentClass.self)
+            
+            for value in registerClassPrifxArray {
+                if (fullClassName.containsSubString(substring: value))  {
+                    if currentClass is UIViewController.Type {
+                        resultXLClass.append(currentClass)
+                    }
+                    
+    #if DEBUG
+                    if let clss = currentClass as? CustomRouterInfo.Type {
+                        assert(clss.patternString.hasPrefix("scheme://"), "URL非scheme://开头，请重新确认")
+                        apiArray.append(clss.patternString)
+                        classMapArray.append(clss.routerClass)
+                    }
+    #endif
+                }
+            }
+        }
+        
+        for i in 0 ..< resultXLClass.count {
+            let currentClass: AnyClass = resultXLClass[i]
+            if let cls = currentClass as? TheRouterable.Type {
+                let fullName: String = NSStringFromClass(currentClass.self)
+               
+                for s in 0 ..< cls.patternString.count {
+                    
+                    if fullName.hasPrefix(NSKVONotifyingPrefix) {
+                        let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
+                        let subString = fullName[range]
+                        pagePathMap[cls.patternString[s]] = "\(subString)"
+                        TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
+                    } else {
+                        pagePathMap[cls.patternString[s]] = fullName
+                        TheRouter.addRouterItem(cls.patternString[s], classString: fullName)
+                    }
+                }
+            }
+        }
+        
+#if DEBUG
+        debugPrint(pagePathMap)
+        routerForceRecheck()
+#endif
+        TheRouter.routerLoadStatus(true)
+        return TheRouter.openURL(urlPath, userInfo: userInfo)
+}
+```
+To avoid invalid traversal, we pass registerClassPrifxArray specifying that we traverse the class containing these prefixes. 
+Once it is UIViewController.Type, it is stored and then checked to see if it complies with the TheRouterable protocol. 
+If yes, it is automatically registered. No manual registration required.
+
+#### Lazy load of route registration
+ A bad thing about dynamic registration is that it is dynamically registered at startup. 
+ The time for registering in TheRouter is delayed and it is registered when the App passes TheRouter.openURL () for the first time. 
+ It will determine whether the route has been loaded, load it if not, and then open the route.
+
+```Swift
+@discardableResult
+public class func openURL(_ urlString: String, userInfo: [String: Any] = [String: Any]()) -> Any? {
+    if urlString.isEmpty {
+        return nil
+    }
+    if !shareInstance.isLoaded {
+        return shareInstance.lazyRegisterHandleBlock?(urlString, userInfo)
+    } else {
+       return openCacheRouter((urlString, userInfo))
+    }
+}
+
+// MARK: - Public method
+@discardableResult
+public class func openURL(_ uriTuple: (String, [String: Any])) -> Any? {
+    if !shareInstance.isLoaded {
+        return shareInstance.lazyRegisterHandleBlock?(uriTuple.0, uriTuple.1)
+    } else {
+        return openCacheRouter(uriTuple)
+    }
+}
+
+public class func openCacheRouter(_ uriTuple: (String, [String: Any])) -> Any? {
+
+    if uriTuple.0.isEmpty {
+        return nil
+    }
+
+    if uriTuple.0.contains(shareInstance.serviceHost) {
+        return routerService(uriTuple)
+    } else {
+        return routerJump(uriTuple)
+    }
+}
+```
+#### How can OC classes also enjoy Swift routes
+This is an OC class interface, the implementation of the route jump needs to inherit OC class, and implement the TheRouterAble protocol
+
+```Swift
+@interface TheRouterBController : UIViewController
+@property (nonatomic, strong) UILabel *desLabel;
 @end
 
+@interface TheRouterBController ()
+
+@end
+
+@implementation TheRouterBController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor yellowColor];
+    [self.view addSubview:self.desLabel];
+    // Do any additional setup after loading the view.
+}
+@end
+
+public class TheRouterControllerB: TheRouterBController, TheRouterable {
+
+    public static var patternString: [String] {
+        ["scheme://router/demo2",
+         "scheme://router/demo2-Android"]
+    }
+
+    public static func registerAction(info: [String : Any]) -> Any {
+        let vc =  TheRouterBController()
+        vc.desLabel.text = info.description
+        return vc
+    }
+}
 ```
 
-**step5**
 
-Every time the right to increase when the compiler to create a great target, to `TheRouterAnnotation.plist` automatically. The file write information, and in the specified directory to generate `TheRouter_Mappings.h` file, the file into the corresponding module
+#### Individual registration
 
-<img src="GuideImages/guide3.jpeg">
+```Swift
 
-#### Interceptors and redirects
+TheRouter.addRouterItem(RouteItem(path: "scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可", className: "TheRouter_Example.TheRouterController"))
 
-**Interceptors:**
+TheRouter.addRouterItem(["scheme://router/demo?&desc= Simple registration, directly call TheRouter.addRouterItem() registration ": "TheRouter_Example.TheRouterController"])
 
-```
-// As long as access to hd://com.therouter.test or its path (hd://com.therouter.test/xxx) will enter the callback
-// If YES is returned, the corresponding route event can be executed; otherwise, the route event will be blocked and not executed
-[TheRouter.shared registInterceptorForURLString:@"hd://com.therouter.test/*" handler:^BOOL(TheRouterInfo * _Nonnull router, id  _Nullable (^ _Nonnull continueHandle)(void)) {
-    NSLog(@"will execute router %@", router.URLString);
-    return YES;
-}];
+TheRouter.addRouterItem("scheme://router/demo? & desc = simple registration ", classString: "TheRouter_Example. TheRouterController")
+
+TheRouter.addRouterItem(TheRouterApi.patternString, classString: TheRouterApi.routerClass)
+
+TheRouter.addRouterItem(TheRouterAApi.patternString, classString: TheRouterAApi.routerClass)
 ```
 
-**Redirection:**
+#### Bulk registration
 
-```
-// Redirection refers to the hd://test.com/test/vc event when visiting hd://test.com/test, which is used to migrate the old path or quickly change to another page to take on the business when encountering problems on production environment
-[TheRouter.shared registRedirect:@"hd://test.com/test" to:@"hd://test.com/test/vc"];
-```
-
-#### Executing route events
-
-```
-UIViewController *vc = [TheRouter.shared openVCPath:kRouterPathTestVcVC    // Passing Path
-                                                cmd:TheRouterOpenCMDPush   // Specifying the open command
-                                         withParams:@{@"title":@"123"}     // Specifies the parameters.Assignment to kvc is supported here
-                                            hanlder:^(NSString * _Nonnull tag, NSDictionary * _Nullable result) {
-        !routerInfo.openCompleteHandler ?: routerInfo.openCompleteHandler(tag, result);
-}];
+```Swift
+TheRouter.addRouterItem(["scheme://router/demo": "TheRouter_Example.TheRouterController",
+                    "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
 ```
 
+### 2. Remove
+
+```Swift
+TheRouter.removeRouter(TheRouterViewCApi.patternString)
+```
+
+### 3. Open
+
+Different methods are declared, mainly for obvious differentiation, internal uniform call openURL
+
+Facilitate constructor chain opening routes
+
+```Swift
+let model = TheRouterModel.init(name: "AKyS", age: 18)
+TheRouterBuilder.build("scheme://router/demo")
+    .withInt(key: "intValue", value: 2)
+    .withBool(key: "boolValue", value: false)
+    .withFloat(key: "floatValue", value: 3.1415)
+    .withBool(key: "boolValue", value: false)
+    .withDouble(key: "doubleValue", value: 2.0)
+    .withAny(key: "any", value: model)
+    .navigation()
+
+TheRouterBuilder.build("scheme://router/demo")
+.withInt(key: "intValue", value: 2)
+.withString(key: "stringValue", value: "sdsd")
+.withFloat(key: "floatValue", value: 3.1415)
+.withBool(key: "boolValue", value: false)
+.withDouble(key: "doubleValue", value: 2.0)
+.withAny(key: "any", value: model)
+.navigation { params, instance in
+    
+}
+```
+
+Enable the common route mode
+
+```Swift
+public class TheRouterApi: CustomRouterInfo {
+
+    public static var patternString = "scheme://router/demo"
+    public static var routerClass = "TheRouter_Example.TheRouterController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+
+    public init() {}
+}
+
+public class TheRouterAApi: CustomRouterInfo {
+
+    public static var patternString = "scheme://router/demo1"
+    public static var routerClass = "TheRouter_Example.TheRouterControllerA"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+
+    public init() {}
+}
+
+TheRouter.openURL(TheRouterCApi.init().requiredURL)
+TheRouter.openWebURL("https://xxxxxxxx")
+```
+
+```Swift
+@discardableResult
+public class func openWebURL(_ uriTuple: (String, [String: Any])) -> Any? {
+    return TheRouter.openURL(uriTuple)
+}
+
+@discardableResult
+public class func openWebURL(_ urlString: String,
+                             userInfo: [String: Any] = [String: Any]()) -> Any? {
+    TheRouter.openURL((urlString, userInfo))
+}
+```
+
+Primitive form incoming route and append parameter
+
+```Swift
+TheRouter.openURL(("scheme://router/demo1? id=2&value=3&name=AKyS&desc= Directly call TheRouter.addRouterItem() registration can be, support single registration, batch registration, dynamic registration, lazy loading dynamic registration ", ["descs": "Add parameters "]))
+```
+
+Parameter passing mode
+
+```Swift
+let clouse = { (qrResult: String, qrStatus: Bool) in
+    print("\(qrResult) \(qrStatus)")
+    self.view.makeToast("\(qrResult) \(qrStatus)")
+}
+let model = TheRouterModel.init(name: "AKyS", age: 18)
+TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS", ["model": model, "clouse": clouse]))
+```
+
+### 4. Global failure mapping
+
+```Swift
+TheRouter.globalOpenFailedHandler { info in
+   debugPrint(info)
+}
+```
+
+### 5. Intercept
+
+For example, unified interception in the case of no login: log in before jumping the message list, and jump to the message list after logging in successfully.
+
+```Swift
+ let login = TheRouterLoginApi.parttingString
+ TheRouter.addRouterInterceptor([login], priority: 0) { (info) -> Bool in
+       if LALoginManger.shared.isLogin {
+             return true
+       } else {
+             TheRouter.openURL(TheRouterLoginApi().build)
+             return false
+       }
+ }
+```
+
+After successful login, delete the interceptor.
+
+### 6. The Path and class are correctly and securely verified
+
+```Swift
+// MARK: - 客户端强制校验，是否匹配
+public static func routerForceRecheck() {
+    let patternArray = Set(pagePathMap.keys)
+    let apiPathArray = Set(apiArray)
+    let diffArray = patternArray.symmetricDifference(apiPathArray)
+    debugPrint("URL差集：\(diffArray)")
+    debugPrint("pagePathMap：\(pagePathMap)")
+    assert(diffArray.count == 0, "URL 拼写错误，请确认差集中的url是否匹配")
+
+    let patternValueArray = Set(pagePathMap.values)
+    let classPathArray = Set(classMapArray)
+    let diffClassesArray = patternValueArray.symmetricDifference(classPathArray)
+    debugPrint("classes差集：\(diffClassesArray)")
+    assert(diffClassesArray.count == 0, "classes 拼写错误，请确认差集中的class是否匹配")
+}
+```
+
+### 7. Pit route registration -KVO
+A class name mismatch occurred during the local verification of classes. 
+Check the cause: In order to avoid route registration at startup, affecting the startup speed, the lazy loading method is adopted, that is, the route interface is registered and then jumped when it is opened for the first time.
+However, before we dynamically register, because KVO (Key-Value Observing) is added to a certain class, this class changes its className to NSKVONotifying_xxx during the pass. We need special treatment, as follows
+
+```Swift
+/// 对于KVO监听，动态创建子类，需要特殊处理
+public let NSKVONotifyingPrefix = "NSKVONotifying_"
+
+if fullName.hasPrefix(NSKVONotifyingPrefix) {
+    let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
+    let subString = fullName[range]
+    pagePathMap[cls.patternString[s]] = "\(subString)"
+    TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
+}
+```
+
+## Dynamic call routing
+Under the above routing capability, we hope that the App can dynamically add routes, delete routes, redirect routes, tune up local services through routes, and remotely tune up App services through routes, and then carry out dynamic expansion.
+
+### Redirection function
+Define the routing delivery model data structure
+
+```Swift
+public struct TheRouterInfo {
+    public init() {}
+    
+    public var targetPath: String = ""
+    public var orginPath: String = ""
+    // 1: 表示替换或者修复客户端代码path错误 2: 新增路由 3:删除路由, 4: 重置路由
+    public var routerType: TheRouterReloadMapEnum = .none 
+    public var path: String = "" // 新的路由地址
+    public var className: String = "" // 路由地址对应的界面
+    public var params: [String: Any] = [:]
+}
+```
+
+When redirection data is delivered remotely, the service logic that switches to the white screen is switched to the yellow screen.
+
+```Swift
+let relocationMap = ["routerType": 1, "targetPath": "scheme://router/demo1", "orginPath": "scheme://router/demo"] as NSDictionary
+TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
+TheRouter.openURL("scheme://router/demo?desc=跳转白色界面被重定向到了黄色界面")
+```
+
+### Redirect recovery
+In a business, business adjustments are often made, so redirects need to be removed if they need to be restored after a redirection.
+
+```Swift
+let relocationMap = ["routerType": 4, "targetPath": "scheme://router/demo", "orginPath": "scheme://router/demo"] as NSDictionary
+TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
+TheRouter.openURL("scheme://router/demo?desc=跳转白色界面被重定向到了黄色界面之后，根据下发数据又恢复到跳转白色界面")
+```
+
+### The route Path was dynamically restored.
+Procedure In actual development, the developer enters the wrong route Path carelessly, and normal service forwarding cannot be performed after going online.
+In this case, the remote route needs to be delivered for matching. 
+``scheme://router/demo3`` is the correct path, but the path of the incorrectly written route is ``scheme://router/demo33``. In this case, you need to create a new path for mapping.
+
+```Swift
+let relocationMap = ["routerType": 2, "className": "TheRouter_Example.TheRouterControllerC", "path": "scheme://router/demo33"] as NSDictionary
+TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
+let value = TheRouterCApi.init().requiredURL
+TheRouter.openURL(value)
+```
+
+### Routes match different Android-based paths
+In actual development, once the URI is used in this way, involving the two ends, there can be a problem of inconsistency on the two ends, 
+so how to solve it, you can solve it by adding a new route path locally, or you can solve it by sending a new route remotely.
+
+```Swift
+public class TheRouterControllerB: TheRouterBController, TheRouterable {
+
+    public static var patternString: [String] {
+        ["scheme://router/demo2",
+         "scheme://router/demo2Android"]
+    }
+
+    public static func registerAction(info: [String : Any]) -> Any {
+        let vc =  TheRouterBController()
+        vc.desLabel.text = info.description
+        return vc
+    }
+}
+```
+
+
+## How to declare and implement services
+
+ The service uses runtime dynamic registration, so you don't have to worry about the service not being registered. Just use it like the above case.
+
+```Swift
+public class func registerServices() {
+    
+    let expectedClassCount = objc_getClassList(nil, 0)
+    let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
+    let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
+    let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
+    var resultXLClass = [AnyClass]()
+    for i in 0 ..< actualClassCount {
+        
+        let currentClass: AnyClass = allClasses[Int(i)]
+        if (class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil),
+           (class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil),
+           let cls = currentClass as? TheRouterServiceProtocol.Type {
+            print(currentClass)
+            resultXLClass.append(cls)
+            
+            TheRouterServiceManager.default.registerService(named: cls.seriverName, lazyCreator: (cls as! NSObject.Type).init())
+        }
+    }
+}
+```
+
+### The route invokes the local service
+
+How to declare and implement services
+
+```Swift
+@objc
+public protocol AppConfigServiceProtocol: TheRouterServiceProtocol {
+    // 打开小程序
+    func openMiniProgram(info: [String: Any])
+}
+
+final class ConfigModuleService: NSObject, AppConfigServiceProtocol {
+    
+    static var seriverName: String {
+        String(describing: AppConfigServiceProtocol.self)
+    }
+    
+    func openMiniProgram(info: [String : Any]) {
+        if let window = UIApplication.shared.delegate?.window {
+            window?.makeToast("打开微信小程序", duration: 1, position: window?.center)
+        }
+    }
+}
+
+```
+Call Service
+
+```Swift
+ if let appConfigService = TheRouter.fetchService(AppConfigServiceProtocol.self){
+     appConfigService.openMiniProgram(info: [:])
+}
+```
+
+### Route the remote end to invoke the local service: service interface delivery, MQTT,JSBridge
+
+```Swift
+let dict = ["ivar1": ["key":"value"]]
+let url = "scheme://services?protocol=AppConfigServiceProtocol&method=openMiniProgramWithInfo:&resultType=0"
+TheRouter.openURL((url, dict))
+```
+
+```Swift
+public class func routerService(_ uriTuple: (String, [String: Any])) -> Any? {
+   let request = TheRouterRequest.init(uriTuple.0)
+   let queries = request.queries
+   guard let protocols = queries["protocol"] as? String,
+           let methods = queries["method"] as? String else {
+       assert(queries["protocol"] != nil, "The protocol name is empty")
+       assert(queries["method"] != nil, "The method name is empty")
+       shareInstance.logcat?(uriTuple.0, .logError, "protocol or method is empty，Unable to initiate service")
+       return nil
+   }
+   // 为了使用方便，针对1个参数或2个参数，依旧可以按照ivar1，ivar2进行传递，自动匹配。对于没有ivar1参数的,但是方法中必须有参数的，将queries赋值作为ivar1。
+   shareInstance.logcat?(uriTuple.0, .logNormal, "")
+ 
+   if let functionResultType = uriTuple.1[TheRouterFunctionResultKey] as? Int {
+       if functionResultType == TheRouterFunctionResultType.voidType.rawValue {
+           self.performTargetVoidType(protocolName: protocols,
+                                                  actionName: methods,
+                                                  param: uriTuple.1[TheRouterIvar1Key],
+                                                  otherParam: uriTuple.1[TheRouterIvar2Key])
+           return nil
+       } else if functionResultType == TheRouterFunctionResultType.valueType.rawValue {
+           let exectueResult = self.performTarget(protocolName: protocols,
+                                                  actionName: methods,
+                                                  param: uriTuple.1[TheRouterIvar1Key],
+                                                  otherParam: uriTuple.1[TheRouterIvar2Key])
+           return exectueResult?.takeUnretainedValue()
+       } else if functionResultType == TheRouterFunctionResultType.referenceType.rawValue {
+           let exectueResult = self.performTarget(protocolName: protocols,
+                                                  actionName: methods,
+                                                  param: uriTuple.1[TheRouterIvar1Key],
+                                                  otherParam: uriTuple.1[TheRouterIvar2Key])
+           return exectueResult?.takeRetainedValue()
+       }
+   }
+   return nil
+}
+```
+
+## Would you consider Swift5.9 Macros？
+
+From the current implementation architecture, lazy loading combined with dynamic registration has solved the performance issues during registration. Even if it is necessary to traverse the entire engineering classes and process the relevant logic, it will not exceed 0.2 seconds. The reason why the path can be obtained through Class is because static variables are declared for the class.
+
+```Swift
+/// 实现TheRouterable协议
+extension TheRouterController: TheRouterable {
+    
+    static var patternString: [String] {
+        ["scheme://router/demo"]
+    }
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        debugPrint(info)
+        
+        let vc =  TheRouterController()
+        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
+        vc.resultLabel.text = info.description
+        return vc
+    }
+}
+```
 ## Author
 
 [HUOLALA mobile technology team](https://juejin.cn/user/1768489241815070)
