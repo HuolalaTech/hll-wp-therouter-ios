@@ -658,3 +658,6 @@ extension TheRouterController: TheRouterable {
 ## 开源协议
 
 TheRouter 采用Apache2.0协议，详情参考[LICENSE](LICENSE)
+
+## 交流沟通群
+![](https://github.com/summerHearts/TheRouter-Swift/blob/main/assets/IMG_3401.JPG)
