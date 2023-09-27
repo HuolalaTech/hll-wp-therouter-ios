@@ -24,7 +24,8 @@ TODO: Add long description of the pod here.
   s.homepage         = 'https://github.com/HuolalaTech/therouter-ios'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'mars' => 'mars.yao' }
-  s.source           = { :git => 'https://github.com/HuolalaTech/hll-wp-therouter-ios.git', :tag => s.version.to_s }  s.source_files = 'TheRouter/Classes/**/*'
+  s.source           = { :git => 'https://github.com/HuolalaTech/hll-wp-therouter-ios.git', :tag => s.version.to_s } 
+  s.source_files = 'TheRouter/Classes/**/*'
   s.frameworks = 'UIKit', 'Foundation'
   s.ios.deployment_target = '11.0'
   # swift 支持的版本
