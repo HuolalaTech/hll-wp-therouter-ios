@@ -660,4 +660,4 @@ extension TheRouterController: TheRouterable {
 TheRouter 采用Apache2.0协议，详情参考[LICENSE](LICENSE)
 
 ## 交流沟通群
-![](https://i.mji.rip/2023/10/18/6ffd9acd6d8242c48c75e601297eba06.jpeg)
+![](https://i.mji.rip/2023/10/24/bdb63307cdeaabf02b2e9ebc032dd231.jpeg)
