@@ -142,7 +142,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo2?id=2&value=3&name=AKyS&desc=runtime动态注册中，会找到KVO监听派生子类标志NSKVONotifying_，但其并不是我们真正使用的工程类，需要特殊处理，通过字符截取找到真正的指向类", ["model": model]))
         case 7:
-            TheRouter.openURL("scheme://router/demo?desc=缓存跳转")
+            TheRouter.openURL("scheme://router/demo9?desc=缓存跳转")
         default:
             break
         }
