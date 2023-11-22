@@ -9,14 +9,23 @@ import Foundation
 import UIKit
 
 // MARK: - Constants
-// 跳转类型
+// 跳转类型Key
 public let LAJumpTypeKey = "jumpType"
-// 第一个参数
+// 第一个参数Key
 public let TheRouterIvar1Key = "ivar1"
-// 第二个参数
+// 第二个参数Key
 public let TheRouterIvar2Key = "ivar2"
-// 返回值类型
+// 返回值类型Key
 public let TheRouterFunctionResultKey = "resultType"
+// 路由Path常量Key
+public let TheRouterPath = "path"
+// 路由class常量Key
+public let TheRouterClassName = "class"
+//路由priority常量Key
+public let TheRouterPriority = "priority"
+
+//路由优先级默认值
+public let TheRouterDefaultPriority: UInt = 1000
 
 public typealias ComplateHandler = (([String: Any]?, Any?) -> Void)?
 
