@@ -21,7 +21,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                          "注册路由是否正确的本地安全检查",
                                          "动态注册路由的性能优化部分",
                                          "OC类路由的动态注册实现",
-                                         "动态注册中KVO派生子类处理"],
+                                         "动态注册中KVO派生子类处理",
+                                         "缓存跳转"],
                                         ["无参数跳转",
                                          "有参数跳转",
                                          "多参数类型跳转",
@@ -140,6 +141,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
            
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo2?id=2&value=3&name=AKyS&desc=runtime动态注册中，会找到KVO监听派生子类标志NSKVONotifying_，但其并不是我们真正使用的工程类，需要特殊处理，通过字符截取找到真正的指向类", ["model": model]))
+        case 7:
+            TheRouter.openURL("scheme://router/demo?desc=缓存跳转")
         default:
             break
         }

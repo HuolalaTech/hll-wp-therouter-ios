@@ -93,3 +93,12 @@ public class TheRouterWebApi: CustomRouterInfo {
     public init() {}
 }
 
+public class TheRouterEApi: CustomRouterInfo {
+    
+    public static var patternString = "scheme://router/demo9"
+    public static var routerClass = "TheRouter_Example.TheRouterControllerE"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+    
+    public init() {}
+}

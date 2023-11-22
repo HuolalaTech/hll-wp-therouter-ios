@@ -21,4 +21,8 @@ public class TheRouterControllerB: TheRouterBController, TheRouterable {
         vc.desLabel.text = info.description
         return vc
     }
+    
+    public static var priority: UInt {
+        TheRouterDefaultPriority
+    }
 }

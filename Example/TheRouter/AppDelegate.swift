@@ -22,11 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         // 路由懒加载注册
+        TheRouterManager.loadRouterClass([".The"], useCache: true)
+        
         TheRouter.lazyRegisterRouterHandle { url, userInfo in
             TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
             return TheRouterManager.addGloableRouter([".The"], url, userInfo)
         }
-
+        
         // 动态注册服务
         TheRouterManager.registerServices()
 

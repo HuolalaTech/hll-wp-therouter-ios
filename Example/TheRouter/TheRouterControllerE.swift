@@ -1,8 +1,8 @@
 //
-//  TheRouterViewController.swift
+//  TheRouterControllerE.swift
 //  TheRouter_Example
 //
-//  Created by mars.yao on 2023/3/8.
+//  Created by mars.yao on 2023/11/22.
 //  Copyright © 2023 CocoaPods. All rights reserved.
 //
 
@@ -11,14 +11,12 @@ import UIKit
 import TheRouter
 import SnapKit
 
-public typealias QrScanResultCallBack = (_ qrResult: String, _ isSucess: Bool) -> Void
-
-class TheRouterController: UIViewController {
+class TheRouterControllerE: UIViewController {
 
     // 扫码完成回调
     public var qrResultCallBack: QrScanResultCallBack?
     
-    private lazy var resultLabel: UILabel = {
+    public lazy var resultLabel: UILabel = {
         let lb = UILabel()
         lb.textColor = .black
         lb.font = UIFont.systemFont(ofSize: 15)
@@ -29,7 +27,7 @@ class TheRouterController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .purple
         self.view.addSubview(resultLabel)
     
         resultLabel.snp.makeConstraints { make in
@@ -53,16 +51,16 @@ class TheRouterController: UIViewController {
 
 }
 
-extension TheRouterController: TheRouterable {
+extension TheRouterControllerE: TheRouterable {
     
     static var patternString: [String] {
-        ["scheme://router/demo"]
+        ["scheme://router/demo9"]
     }
     
     static func registerAction(info: [String : Any]) -> Any {
         debugPrint(info)
         
-        let vc =  TheRouterController()
+        let vc =  TheRouterControllerE()
         vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
         vc.resultLabel.text = info.description
         return vc

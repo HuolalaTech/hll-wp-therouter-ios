@@ -65,4 +65,8 @@ extension TheRouterControllerD: TheRouterable {
         vc.resultLabel.text = info.description
         return vc
     }
+    
+    static var priority: UInt {
+        TheRouterDefaultPriority
+    }
 }

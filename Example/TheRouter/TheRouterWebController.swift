@@ -88,4 +88,8 @@ extension TheRouterWebController: TheRouterable {
         return webVC
     }
     
+    static var priority: UInt {
+        TheRouterDefaultPriority
+    }
+    
 }
