@@ -31,6 +31,8 @@ In addition, it supports finding corresponding modules through Service-Protocol,
 * **7. Chain programming:**  Support chain programming to concatenate urls and parameters;
 * **8. Adaptation Objective-C** : OC classes can dynamically register in Swift using inheritance to follow the protocol.
 * **9. Service call:**  Support local service call and remote service call;
+* **10. Added asynchronous acquisition of eligible registration classes**: Find classes that implement routing protocols in projects and store them in advance;
+* **11. Added routing local server capability**: Every time you restart the application, you need to go through the registration process again. Added local server capability based on version number to avoid initial registration;
 
 | number | desc | instanceCode |
 |:----|:---:|:---:|
@@ -51,7 +53,8 @@ In addition, it supports finding corresponding modules through Service-Protocol,
 | 15 | Support for chain calling| TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation() |
 | 16 | Supports opening routing callback closures | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation(_ complateHandler: ComplateHandler = nil) |
 | 17 | Support non chain calling to open routing callback closures | TheRouter.openURL("https://therouter.cn/" ) { param, instance in } |
-
+| 18 | Add asynchronous retrieval of qualified registration classes | TheRouterManager.fetchRouterRegisterClass() |
+| 19 | Increase route local caching capability | TheRouterManager.fetchRouterRegisterClass([.The], userCache: true) |
 
 # Background
 
@@ -107,7 +110,7 @@ In order to keep consistent with the Android side, the URL and class registratio
 Add the following entry in your Podfile:
 
 ```ruby
-   pod 'TheRouter', '1.1.0'
+   pod 'TheRouter', '1.1.1'
 ```
 
 ## Swift Restricted version
@@ -138,10 +141,17 @@ extension TheRouterController: TheRouterable {
        vc.resultLabel.text = info.description
        return vc
    }
+
+   static var priority: UInt {
+       TheRouterDefaultPriority
+   }
 }
 
 /// 在AppDelegate中实现懒加载的闭包
 // 路由懒加载注册
+
+TheRouterManager.loadRouterClass([".The"], useCache: true)
+
 TheRouter.lazyRegisterRouterHandle { url, userInfo in
     TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
     return TheRouterManager.addGloableRouter([".The"], url, userInfo)

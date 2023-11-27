@@ -22,6 +22,9 @@
 * **7. 链式编程**：支持链式编程方式拼接URL与参数；
 * **8. 适配Objective-C**：OC类可以在Swift中使用继承的方式遵循协议来进行动态注册；
 * **9. 服务调用**：支持本地服务调用与远端服务调用；
+* **10. 增加异步获取符合条件注册类**：遍历工程实现路由协议的类，并提前存储；
+* **11. 增加路由本地缓存能力**：每次重启应用，需要重新走注册流程，增加根据版本号进行本地缓存能力，避免初次注册;
+
 
 | 功能序号 | 功能描述 | 事例代码及注释 |
 |:----|:---:|:---:|
@@ -42,6 +45,9 @@
 | 15 | 支持链式调用 | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation() |
 | 16 | 支持链式调用打开路由回调闭包 | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation(_ complateHandler: ComplateHandler = nil) |
 | 17 | 支持非链式调用打开路由回调闭包 | TheRouter.openURL("https://therouter.cn/" ) { param, instance in } |
+| 18 | 增加异步获取符合条件注册类 | TheRouterManager.fetchRouterRegisterClass() |
+| 19 | 增加路由本地缓存能力 | TheRouterManager.fetchRouterRegisterClass([.The], userCache: true) |
+
 # 背景
 随着项目需求的日益增加，开发人员的不断增加，带来了很多问题：
 
@@ -95,7 +101,7 @@
 Add the following entry in your Podfile:
 
 ```ruby
-   pod 'TheRouter', '1.1.0'
+   pod 'TheRouter', '1.1.1'
 ```
 
 ## Swift限制版本
@@ -126,10 +132,17 @@ extension TheRouterController: TheRouterable {
         vc.resultLabel.text = info.description
         return vc
     }
+
+    static var priority: UInt {
+        TheRouterDefaultPriority
+    }
 }
 
 /// 在AppDelegate中实现懒加载的闭包
 // 路由懒加载注册
+
+TheRouterManager.loadRouterClass([".The"], useCache: true)
+
 TheRouter.lazyRegisterRouterHandle { url, userInfo in
     TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
     return TheRouterManager.addGloableRouter([".The"], url, userInfo)
