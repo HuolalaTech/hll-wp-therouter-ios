@@ -13,12 +13,22 @@ public let NSKVONotifyingPrefix = "KVONotifying_"
 /// 神策动态类
 public let kSADelegateClassSensorsSuffix = "_CN.SENSORSDATA"
 
+/// 排除苹果系统类
+public let kSAppleSuffix = "com.apple"
+
+/// 排除cocoaPods相关库
+public let kSCocoaPodsSuffix = "org.cocoapods"
+
 public class TheRouterManager: NSObject {
     
     static public let shareInstance = TheRouterManager()
-    
+    // 是否使用缓存
+    public var useCache: Bool = false
     // MARK: - 注册路由
-    public static func addGloableRouter(_ registerClassPrifxArray: [String], _ urlPath: String, _ userInfo: [String: Any]) -> Any? {
+    public static func addGloableRouter(_ registerClassPrifxArray: [String],
+                                        _ excludeCocoapods: Bool = false,
+                                        _ urlPath: String,
+                                        _ userInfo: [String: Any]) -> Any? {
         
         TheRouter.globalOpenFailedHandler { (info) in
             guard let matchFailedKey = info[TheRouter.matchFailedKey] as? String else { return }
@@ -26,7 +36,7 @@ public class TheRouterManager: NSObject {
             TheRouter.shareInstance.logcat?("TheRouter: globalOpenFailedHandler", .logError, "\(matchFailedKey)")
         }
         
-        return TheRouterManager.registerRouterMap(registerClassPrifxArray, urlPath, userInfo)
+        return TheRouterManager.registerRouterMap(registerClassPrifxArray, excludeCocoapods, urlPath, userInfo)
     }
     
     // MARK: -注册web与服务调用
@@ -43,13 +53,22 @@ extension TheRouterManager {
     static var registerRouterList: Array = [[String: String]]()
     
     // MARK: - 自动注册路由
+    /// 获取符合注册条件的路由类
+    /// - Parameters:
+    ///   - registerClassPrifxArray: 工程中类开始的名称
+    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    ///   - urlPath: 将要打开的路由path
+    ///   - userInfo: 路由传递的参数
     public class func registerRouterMap(_ registerClassPrifxArray: [String],
+                                        _ excludeCocoapods: Bool = false,
                                         _ urlPath: String,
                                         _ userInfo: [String: Any]) -> Any? {
         
         let beginRegisterTime = CFAbsoluteTimeGetCurrent()
+        
         if registerRouterList.isEmpty {
-            registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray)
+            registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray, excludeCocoapods)
         }
         for item in registerRouterList {
             var priority: UInt32 = 0
@@ -59,19 +78,31 @@ extension TheRouterManager {
             TheRouter.addRouterItem(item[TheRouterPath] ?? "", priority: priority, classString: item[TheRouterClassName] ?? "")
         }
         let endRegisterTime = CFAbsoluteTimeGetCurrent()
-        TheRouter.shareInstance.logcat?("注册路由耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
         TheRouter.routerLoadStatus(true)
+        if TheRouterManager.shareInstance.useCache {
+            TheRouter.shareInstance.logcat?("使用缓存注册路由耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
+        } else {
+            TheRouter.shareInstance.logcat?("未使用缓存注册路由耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
+        }
 #if DEBUG
-        routerForceRecheck(registerClassPrifxArray)
+        routerForceRecheck(registerClassPrifxArray, excludeCocoapods)
 #endif
         return TheRouter.openURL(urlPath, userInfo: userInfo)
     }
     
+    
+    /// 获取符合注册条件的路由类
+    /// - Parameters:
+    ///   - registerClassPrifxArray: 工程中类开始的名称
+    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    ///   - useCache: 是否使用本地缓存
     public class func loadRouterClass(_ registerClassPrifxArray: [String],
+                                      _ excludeCocoapods: Bool = false,
                                       useCache: Bool = false) {
-        
+        TheRouterManager.shareInstance.useCache = useCache
         if TheRouterDebugTool.checkTracing() || !useCache {
-            registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray)
+            registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray, excludeCocoapods)
         } else {
             let cachePath = fetchCurrentVersionRouterCachePath()
             let fileExists = fileExists(atPath: cachePath)
@@ -83,33 +114,64 @@ extension TheRouterManager {
             if useCache && fileExists && !cacheData.isEmpty {
                 registerRouterList = cacheData
             } else {
-                registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray)
+                registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray, excludeCocoapods)
             }
         }
     }
     
+    
     // MARK: - 提前获取工程中符合路由注册条件的类
+    /// - Parameters:
+    ///   - registerClassPrifxArray: 工程中类开始的名称
+    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    ///   - useCache: 是否使用本地缓存
     public class func fetchRouterRegisterClass(_ registerClassPrifxArray: [String],
+                                               _ excludeCocoapods: Bool = false,
                                                _ localCache: Bool = false) -> [[String: String]] {
-        var registerRouterList: Array = [[String: String]]()
-        
-        let expectedClassCount = objc_getClassList(nil, 0)
-        let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-        let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-        let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
+        let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         
         var resultXLClass = [AnyClass]()
-        for i in 0 ..< actualClassCount {
+        
+        let bundles = CFBundleGetAllBundles() as? [CFBundle]
+        for bundle in bundles ?? [] {
+            let identifier = CFBundleGetIdentifier(bundle);
             
-            let currentClass: AnyClass = allClasses[Int(i)]
-            let fullClassName: String = NSStringFromClass(currentClass.self)
+            if excludeCocoapods {
+                
+                if let id = identifier as? String {
+                    if  id.hasPrefix(kSAppleSuffix) == true || id.hasPrefix(kSCocoaPodsSuffix) == true {
+                        break
+                    }
+                } else {
+                    if let id = identifier as? String {
+                        if  id.hasPrefix(kSAppleSuffix) == true {
+                            break
+                        }
+                    }
+                }
+            }
             
-            for value in registerClassPrifxArray {
-                if (fullClassName.containsSubString(substring: value))  {
-                    if (class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil),
-                       (class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil), let cls =  currentClass as? UIViewController.Type {
+            let execURL = CFBundleCopyExecutableURL(bundle) as NSURL
+            let imageURL = execURL.fileSystemRepresentation
+            let classCount = UnsafeMutablePointer<UInt32>.allocate(capacity: MemoryLayout<UInt32>.stride)
+            guard let classNames = objc_copyClassNamesForImage(imageURL, classCount) else {
+                continue
+            }
+            
+            
+            for idx in 0..<classCount.pointee {
+                let currentClassName = String(cString: classNames[Int(idx)])
+                guard let currentClass = NSClassFromString(currentClassName) else {
+                    continue
+                }
+                
+                if class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil,
+                   class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil {
+                    if let cls =  currentClass as? UIViewController.Type {
                         resultXLClass.append(cls)
                     }
+                    
 #if DEBUG
                     if let clss = currentClass as? CustomRouterInfo.Type {
                         apiArray.append(clss.patternString)
@@ -120,16 +182,16 @@ extension TheRouterManager {
             }
         }
         
+        
         for i in 0 ..< resultXLClass.count {
             let currentClass: AnyClass = resultXLClass[i]
             if let cls = currentClass as? TheRouterable.Type {
                 let fullName: String = NSStringFromClass(currentClass.self)
+                if fullName.contains(kSADelegateClassSensorsSuffix)  {
+                    break
+                }
                 
                 for s in 0 ..< cls.patternString.count {
-                    
-                    if fullName.contains(kSADelegateClassSensorsSuffix)  {
-                        break
-                    }
                     
                     if fullName.contains(NSKVONotifyingPrefix) {
                         let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
@@ -141,54 +203,116 @@ extension TheRouterManager {
                 }
             }
         }
-        
+        let endRegisterTime = CFAbsoluteTimeGetCurrent()
+        TheRouter.shareInstance.logcat?("前获取工程中符合路由注册条件的类耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
         writeRouterMapToFile(mapArray: registerRouterList)
         return registerRouterList
     }
     
-    class func runtimeRouterList(_ registerClassPrifxArray: [String]) {
+    // MARK: - 如果使用本地缓存，需要再次动态获取注册类来进行debug环境下的一致性教研
+    /// - Parameters:
+    ///   - registerClassPrifxArray: 工程中类开始的名称
+    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    ///   - useCache: 是否使用本地缓存
+    class func runtimeRouterList(_ registerClassPrifxArray: [String],
+                                 _ excludeCocoapods: Bool = false) {
+        let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         
-        let expectedClassCount = objc_getClassList(nil, 0)
-        let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-        let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-        let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
-        
-        for i in 0 ..< actualClassCount {
+        let bundles = CFBundleGetAllBundles() as? [CFBundle]
+        for bundle in bundles ?? [] {
+            let identifier = CFBundleGetIdentifier(bundle);
             
-            let currentClass: AnyClass = allClasses[Int(i)]
-            let fullClassName: String = NSStringFromClass(currentClass.self)
+            if excludeCocoapods {
+                
+                if let id = identifier as? String {
+                    if  id.hasPrefix(kSAppleSuffix) == true || id.hasPrefix(kSCocoaPodsSuffix) == true {
+                        break
+                    }
+                } else {
+                    if let id = identifier as? String {
+                        if  id.hasPrefix(kSAppleSuffix) == true {
+                            break
+                        }
+                    }
+                }
+            }
             
-            for value in registerClassPrifxArray {
-                if (fullClassName.containsSubString(substring: value))  {
-                    if let clss = currentClass as? CustomRouterInfo.Type {
-                        apiArray.append(clss.patternString)
-                        classMapArray.append(clss.routerClass)
+            let execURL = CFBundleCopyExecutableURL(bundle) as NSURL
+            let imageURL = execURL.fileSystemRepresentation
+            let classCount = UnsafeMutablePointer<UInt32>.allocate(capacity: MemoryLayout<UInt32>.stride)
+            guard let classNames = objc_copyClassNamesForImage(imageURL, classCount) else {
+                continue
+            }
+            
+            for idx in 0..<classCount.pointee {
+                let currentClassName = String(cString: classNames[Int(idx)])
+                guard let currentClass = NSClassFromString(currentClassName) else {
+                    continue
+                }
+                
+                for value in registerClassPrifxArray {
+                    if class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil,
+                       class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil,
+                       (currentClassName.containsSubString(substring: value))  {
+                        if let clss = currentClass as? CustomRouterInfo.Type {
+                            apiArray.append(clss.patternString)
+                            classMapArray.append(clss.routerClass)
+                        }
                     }
                 }
             }
         }
+        let endRegisterTime = CFAbsoluteTimeGetCurrent()
+        TheRouter.shareInstance.logcat?("路由提前注册耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
     }
     
     // MARK: - 自动注册服务
-    public class func registerServices() {
-        
-        let expectedClassCount = objc_getClassList(nil, 0)
-        let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-        let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-        let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
-        var resultXLClass = [AnyClass]()
-        for i in 0 ..< actualClassCount {
+    /// 自动注册服务
+    /// - Parameter excludeBundleIdentifier:排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是 org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    public class func registerServices(excludeCocoapods: Bool = false) {
+        let beginRegisterTime = CFAbsoluteTimeGetCurrent()
+        let bundles = CFBundleGetAllBundles() as? [CFBundle]
+        for bundle in bundles ?? [] {
+            let identifier = CFBundleGetIdentifier(bundle);
             
-            let currentClass: AnyClass = allClasses[Int(i)]
-            if (class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil),
-               (class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil),
-               let cls = currentClass as? TheRouterServiceProtocol.Type {
-                print(currentClass)
-                resultXLClass.append(cls)
+            if excludeCocoapods {
                 
-                TheRouterServiceManager.default.registerService(named: cls.seriverName, lazyCreator: (cls as! NSObject.Type).init())
+                if let id = identifier as? String {
+                    if  id.hasPrefix(kSAppleSuffix) == true || id.hasPrefix(kSCocoaPodsSuffix) == true {
+                        break
+                    }
+                } else {
+                    if let id = identifier as? String {
+                        if  id.hasPrefix(kSAppleSuffix) == true {
+                            break
+                        }
+                    }
+                }
+            }
+            
+            let execURL = CFBundleCopyExecutableURL(bundle) as NSURL
+            let imageURL = execURL.fileSystemRepresentation
+            let classCount = UnsafeMutablePointer<UInt32>.allocate(capacity: MemoryLayout<UInt32>.stride)
+            guard let classNames = objc_copyClassNamesForImage(imageURL, classCount) else {
+                continue
+            }
+            
+            for idx in 0..<classCount.pointee {
+                let currentClassName = String(cString: classNames[Int(idx)])
+                guard let currentClass = NSClassFromString(currentClassName) else {
+                    continue
+                }
+                if class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil,
+                   class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil,
+                   let cls = currentClass as? TheRouterServiceProtocol.Type {
+                    TheRouterServiceManager.default.registerService(named: cls.seriverName, lazyCreator: (cls as! NSObject.Type).init())
+                }
             }
         }
+        
+        let endRegisterTime = CFAbsoluteTimeGetCurrent()
+        TheRouter.shareInstance.logcat?("服务注册耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
     }
     
     // MARK: - 重定向、剔除、新增、重置路由
@@ -248,8 +372,9 @@ extension TheRouterManager {
     }
     
     // MARK: - 客户端强制校验，是否匹配
-    public static func routerForceRecheck(_ registerClassPrifxArray: [String]) {
-        TheRouterManager.runtimeRouterList(registerClassPrifxArray)
+    public static func routerForceRecheck(_ registerClassPrifxArray: [String],
+                                          _ excludeCocoapods: Bool = false) {
+        TheRouterManager.runtimeRouterList(registerClassPrifxArray, excludeCocoapods)
         let paths = registerRouterList.compactMap { $0[TheRouterPath] }
         let patternArray = Set(paths)
         let apiPathArray = Set(apiArray)
@@ -300,7 +425,7 @@ extension TheRouterManager {
     
     static func loadArrayDictFromJSON(path: String) -> [[String: String]] {
         let url = URL(fileURLWithPath: path)
-
+        
         do {
             let jsonData = try Data(contentsOf: url)
             if let arrayDict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [[String: String]] {
@@ -311,5 +436,5 @@ extension TheRouterManager {
         }
         return [[String: String]]()
     }
-
+    
 }

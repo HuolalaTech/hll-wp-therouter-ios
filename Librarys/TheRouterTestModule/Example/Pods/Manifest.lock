@@ -1,0 +1,27 @@
+PODS:
+  - SnapKit (5.6.0)
+  - TheRouter (1.0.0)
+  - TheRouterTestModule (0.1.0):
+    - SnapKit
+    - TheRouter
+
+DEPENDENCIES:
+  - TheRouterTestModule (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - SnapKit
+    - TheRouter
+
+EXTERNAL SOURCES:
+  TheRouterTestModule:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  TheRouter: 1042fa02846f24fc11421f7e40a03765189d7049
+  TheRouterTestModule: f9dd46d7b5e4bacc39b927999e680197f85f60ef
+
+PODFILE CHECKSUM: 763bc4f7952e092c030e28a656dff4916d5ebfd6
+
+COCOAPODS: 1.13.0

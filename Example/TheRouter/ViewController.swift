@@ -14,7 +14,7 @@ import JKSwiftExtension
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
-        
+    
     var resultDataSource: [[String]] = [["多种注册路由方式",
                                          "动态注册路由并打开",
                                          "懒加载注册路由并打开",
@@ -30,14 +30,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                          "clouse回调参数跳转",
                                          "传递model模型跳转",
                                          "打开web界面",
-                                         "打开路由回调方式"],
+                                         "打开路由回调方式",
+                                         "组件打开方式"],
                                         ["路由重定向能力",
                                          "重定向移除",
                                          "路由解决本地path编写错误",
                                          "路由适配不同的AndroidPath",
                                          "路由调用本地服务",
                                          "路由远端调用本地服务：服务接口下发，MQTT,JSBridge"]]
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "TheRouter"
@@ -117,8 +118,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             TheRouter.addRouterItem(TheRouterAApi.patternString, classString: TheRouterAApi.routerClass)
             TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册字典形式，动态注册TheRouterManager.addGloableRouter，懒加载动态注册 TheRouter.lazyRegisterRouterHandle ")
             TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController",
-                                "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
-
+                                     "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
+            
         case 1:
             TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=动态注册使用runtime遍历工程类，将路由path与对应的class映射进行存储，进行跳转时，映射解析跳转详情查看Function: TheRouterManager.addGloableRouter")
         case 2:
@@ -126,7 +127,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         case 3:
             TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=安全检查是指为了垮模块进行调用，我们统一使用了实现CustomRouterInfo协议的抽象类来管理路由的path与class映射关系，在注册之后，runtime动态注册与抽象类的数据结构映射是否正确，具体实现：TheRouterManager.routerForceRecheck方法中")
         case 4:
-
+            
             let clouse = { (qrResult: String, qrStatus: Bool) in
                 print("\(qrResult) \(qrStatus)")
                 self.view.makeToast("\(qrResult) \(qrStatus)")
@@ -134,11 +135,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS&desc=通过TheRouterManager.addGloableRouter()传入registerClassPrifxArray参数，将指定遍历工程中具有特性前缀名的class，降低遍历数量级，减少性能损耗", ["model": model, "clouse": clouse]))
         case 5:
-        
+            
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo2?id=2&value=3&name=AKyS&desc=这是一个OC类的界面，实现路由的跳转需要继承OC类，并实现TheRouterAble协议即可", ["model": model]))
         case 6:
-           
+            
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo2?id=2&value=3&name=AKyS&desc=runtime动态注册中，会找到KVO监听派生子类标志NSKVONotifying_，但其并不是我们真正使用的工程类，需要特殊处理，通过字符截取找到真正的指向类", ["model": model]))
         case 7:
@@ -158,22 +159,22 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         case 2:
             TheRouter.openURL(("scheme://router/demo?id=3", ["value": 3, "name": "AKyS"]))
         case 3:
-
-        let model = TheRouterModel.init(name: "AKyS", age: 18)
-
-        TheRouterBuilder.build("scheme://router/demo")
-            .withInt(key: "intValue", value: 2)
-            .withString(key: "stringValue", value: "sdsd")
-            .withFloat(key: "floatValue", value: 3.1415)
-            .withBool(key: "boolValue", value: false)
-            .withDouble(key: "doubleValue", value: 2.0)
-            .withAny(key: "any", value: model)
-            .navigation { params, instance in
-                
-            }
-
+            
+            let model = TheRouterModel.init(name: "AKyS", age: 18)
+            
+            TheRouterBuilder.build("scheme://router/demo")
+                .withInt(key: "intValue", value: 2)
+                .withString(key: "stringValue", value: "sdsd")
+                .withFloat(key: "floatValue", value: 3.1415)
+                .withBool(key: "boolValue", value: false)
+                .withDouble(key: "doubleValue", value: 2.0)
+                .withAny(key: "any", value: model)
+                .navigation { params, instance in
+                    
+                }
+            
         case 4:
-
+            
             let clouse = { (qrResult: String, qrStatus: Bool) in
                 print("\(qrResult) \(qrStatus)")
                 self.view.makeToast("\(qrResult) \(qrStatus)")
@@ -191,6 +192,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 // 可以在这里进行移除导航栈操作
                 debugPrint("\(param ?? [:]) \(instance ?? "")")
             }
+        case 8:
+            let model = TheRouterModel.init(name: "AKyS", age: 18)
+            TheRouter.openURL(("scheme://router/demoE3?id=2&value=3&name=AKyS", ["model": model]))
         default:
             break
         }
@@ -218,7 +222,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             TheRouterManager.addRelocationHandle(routerMapList: [routeReMapInfo])
             let value = TheRouterCApi.init().requiredURL
             TheRouter.openURL(value)
-          
+            
         case 3:
             let relocationMap: NSDictionary = ["routerType": 2, "className": "TheRouter_Example.TheRouterControllerD", "path": "scheme://router/demo5"]
             let data = try! JSONSerialization.data(withJSONObject: relocationMap, options: [])

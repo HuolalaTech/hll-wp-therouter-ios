@@ -21,22 +21,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
+        
+        // 日志回调，可以监控线上路由运行情况
+        TheRouter.logcat { url, logType, errorMsg in
+            NSLog("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
+        }
+        
         // 路由懒加载注册
-        TheRouterManager.loadRouterClass([".The"], useCache: true)
+        TheRouterManager.loadRouterClass([".The"], true, useCache: true)
         
         TheRouter.lazyRegisterRouterHandle { url, userInfo in
             TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
-            return TheRouterManager.addGloableRouter([".The"], url, userInfo)
+            return TheRouterManager.addGloableRouter([".The"], true, url, userInfo)
         }
-        
+            
         // 动态注册服务
-        TheRouterManager.registerServices()
-
-        // 日志回调，可以监控线上路由运行情况
-        TheRouter.logcat { url, logType, errorMsg in
-            debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
-        }
-
+        TheRouterManager.registerServices(excludeCocoapods: true)
+        
         return true
     }
 

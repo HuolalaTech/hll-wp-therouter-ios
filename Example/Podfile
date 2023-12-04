@@ -12,7 +12,7 @@ target 'TheRouter_Example' do
   pod 'SnapKit', '5.6.0'
   pod 'Toast', '4.0.0'
   pod 'JKSwiftExtension'
-  
+  pod 'TheRouterTestModule', :path => '../Librarys/TheRouterTestModule'
   target 'TheRouter_Tests' do
     inherit! :search_paths
 

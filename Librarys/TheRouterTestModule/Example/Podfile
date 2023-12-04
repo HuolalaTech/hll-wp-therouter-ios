@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+target 'TheRouterTestModule_Example' do
+  pod 'TheRouterTestModule', :path => '../'
+
+  target 'TheRouterTestModule_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

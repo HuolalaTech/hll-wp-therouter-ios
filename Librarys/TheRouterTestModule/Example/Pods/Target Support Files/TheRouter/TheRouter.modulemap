@@ -1,0 +1,6 @@
+framework module TheRouter {
+  umbrella header "TheRouter-umbrella.h"
+
+  export *
+  module * { export * }
+}
