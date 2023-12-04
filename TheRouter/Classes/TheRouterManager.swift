@@ -137,17 +137,14 @@ extension TheRouterManager {
         for bundle in bundles ?? [] {
             let identifier = CFBundleGetIdentifier(bundle);
             
-            if excludeCocoapods {
-                
-                if let id = identifier as? String {
-                    if  id.hasPrefix(kSAppleSuffix) == true || id.hasPrefix(kSCocoaPodsSuffix) == true {
+            if let id = identifier as? String {
+                if excludeCocoapods {
+                    if  id.hasPrefix(kSAppleSuffix) || id.hasPrefix(kSCocoaPodsSuffix) {
                         break
                     }
                 } else {
-                    if let id = identifier as? String {
-                        if  id.hasPrefix(kSAppleSuffix) == true {
-                            break
-                        }
+                    if  id.hasPrefix(kSAppleSuffix) {
+                        break
                     }
                 }
             }
@@ -223,17 +220,14 @@ extension TheRouterManager {
         for bundle in bundles ?? [] {
             let identifier = CFBundleGetIdentifier(bundle);
             
-            if excludeCocoapods {
-                
-                if let id = identifier as? String {
-                    if  id.hasPrefix(kSAppleSuffix) == true || id.hasPrefix(kSCocoaPodsSuffix) == true {
+            if let id = identifier as? String {
+                if excludeCocoapods {
+                    if  id.hasPrefix(kSAppleSuffix) || id.hasPrefix(kSCocoaPodsSuffix) {
                         break
                     }
                 } else {
-                    if let id = identifier as? String {
-                        if  id.hasPrefix(kSAppleSuffix) == true {
-                            break
-                        }
+                    if  id.hasPrefix(kSAppleSuffix) {
+                        break
                     }
                 }
             }
@@ -276,17 +270,14 @@ extension TheRouterManager {
         for bundle in bundles ?? [] {
             let identifier = CFBundleGetIdentifier(bundle);
             
-            if excludeCocoapods {
-                
-                if let id = identifier as? String {
-                    if  id.hasPrefix(kSAppleSuffix) == true || id.hasPrefix(kSCocoaPodsSuffix) == true {
+            if let id = identifier as? String {
+                if excludeCocoapods {
+                    if  id.hasPrefix(kSAppleSuffix) || id.hasPrefix(kSCocoaPodsSuffix) {
                         break
                     }
                 } else {
-                    if let id = identifier as? String {
-                        if  id.hasPrefix(kSAppleSuffix) == true {
-                            break
-                        }
+                    if  id.hasPrefix(kSAppleSuffix) {
+                        break
                     }
                 }
             }
