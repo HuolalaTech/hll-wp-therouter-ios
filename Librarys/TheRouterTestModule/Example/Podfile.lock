@@ -1,0 +1,29 @@
+PODS:
+  - SnapKit (5.6.0)
+  - TheRouter (1.1.1)
+  - TheRouterTestModule (0.1.0):
+    - SnapKit
+    - TheRouter
+
+DEPENDENCIES:
+  - TheRouter (from `../../../../hll-wp-therouter-ios`)
+  - TheRouterTestModule (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - SnapKit
+
+EXTERNAL SOURCES:
+  TheRouter:
+    :path: "../../../../hll-wp-therouter-ios"
+  TheRouterTestModule:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  TheRouter: 775857b026580c0aca4055016699e27e9cba51e1
+  TheRouterTestModule: f9dd46d7b5e4bacc39b927999e680197f85f60ef
+
+PODFILE CHECKSUM: 6a9c92aa0dddf58926679da663a2e13d3fadfe08
+
+COCOAPODS: 1.13.0

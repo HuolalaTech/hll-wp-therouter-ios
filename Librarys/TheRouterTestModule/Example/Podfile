@@ -1,0 +1,14 @@
+use_frameworks!
+currentPath ="#{Dir.pwd}"
+
+platform :ios, '11.0'
+
+target 'TheRouterTestModule_Example' do
+  pod 'TheRouter', :path => '../../../../hll-wp-therouter-ios'
+  pod 'TheRouterTestModule', :path => '../'
+  target 'TheRouterTestModule_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

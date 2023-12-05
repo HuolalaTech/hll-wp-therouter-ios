@@ -8,11 +8,11 @@ install! 'cocoapods',
   generate_multiple_pod_projects: true
 
 target 'TheRouter_Example' do
+  pod 'TheRouterTestModule', :path => '../Librarys/TheRouterTestModule'
   pod 'TheRouter', :path => '../'
   pod 'SnapKit', '5.6.0'
   pod 'Toast', '4.0.0'
   pod 'JKSwiftExtension'
-  
   target 'TheRouter_Tests' do
     inherit! :search_paths
 
