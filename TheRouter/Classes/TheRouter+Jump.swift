@@ -92,17 +92,19 @@ extension TheRouter {
     }
     
     public class func jump(jumpType: LAJumpType, vc: UIViewController) {
-        switch jumpType {
-        case .modal:
-            modal(vc)
-        case .push:
-            push(vc)
-        case .popToTaget:
-            popToTargetVC(vcClass: type(of: vc))
-        case .windowNavRoot:
-            pusbWindowNavRoot(vc)
-        case .modalDismissBeforePush:
-            modalDismissBeforePush(vc)
+        DispatchQueue.main.async {
+            switch jumpType {
+            case .modal:
+                modal(vc)
+            case .push:
+                push(vc)
+            case .popToTaget:
+                popToTargetVC(vcClass: type(of: vc))
+            case .windowNavRoot:
+                pusbWindowNavRoot(vc)
+            case .modalDismissBeforePush:
+                modalDismissBeforePush(vc)
+            }
         }
     }
     // 服务调用

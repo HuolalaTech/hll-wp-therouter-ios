@@ -37,19 +37,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
         // 动态注册服务
         TheRouterManager.registerServices(excludeCocoapods: true)
-        // 设置延迟时间，例如延迟1秒
-        let delay = DispatchTimeInterval.seconds(1)
 
-        // 在主线程上延迟执行
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            // 这里是需要延迟执行的代码
-            let model = TheRouterModel.init(name: "AKyS", age: 18)
-            TheRouter.openURL(("scheme://router/demoE3?id=2&value=3&name=AKyS", ["model": model]))
-        }
-        
         return true
     }
-
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
