@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// 对于KVO监听，动态创建子类，需要特殊处理
 public let NSKVONotifyingPrefix = "KVONotifying_"
