@@ -10,8 +10,6 @@
 #endif
 #endif
 
-#import "TheRouter+Annotation.h"
-#import "TheRouter.h"
 
 FOUNDATION_EXPORT double TheRouterVersionNumber;
 FOUNDATION_EXPORT const unsigned char TheRouterVersionString[];

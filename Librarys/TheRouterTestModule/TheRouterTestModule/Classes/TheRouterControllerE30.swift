@@ -49,3 +49,21 @@ class TheRouterControllerE30: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 }
+
+extension TheRouterControllerE30: TheRouterable {
+    static var patternString: [String] {
+        ["scheme://router/demoE30"]
+    }
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        
+        let vc =  TheRouterControllerE30()
+        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
+        vc.resultLabel.text = info.description
+        return vc
+    }
+    
+    static var priority: UInt {
+        TheRouterDefaultPriority
+    }
+}

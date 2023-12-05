@@ -50,3 +50,21 @@ class TheRouterControllerE31: UIViewController {
     }
 
 }
+
+extension TheRouterControllerE31: TheRouterable {
+    static var patternString: [String] {
+        ["scheme://router/demoE31"]
+    }
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        
+        let vc =  TheRouterControllerE31()
+        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
+        vc.resultLabel.text = info.description
+        return vc
+    }
+    
+    static var priority: UInt {
+        TheRouterDefaultPriority
+    }
+}

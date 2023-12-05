@@ -214,7 +214,6 @@ extension TheRouterManager {
     ///   - useCache: 是否使用本地缓存
     class func runtimeRouterList(_ registerClassPrifxArray: [String],
                                  _ excludeCocoapods: Bool = false) {
-        let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         
         let bundles = CFBundleGetAllBundles() as? [CFBundle]
         for bundle in bundles ?? [] {
@@ -257,8 +256,6 @@ extension TheRouterManager {
                 }
             }
         }
-        let endRegisterTime = CFAbsoluteTimeGetCurrent()
-        TheRouter.shareInstance.logcat?("路由提前注册耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
     }
     
     // MARK: - 自动注册服务
