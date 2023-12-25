@@ -179,7 +179,9 @@ TheRouter.logcat { url, logType, errorMsg in
 ```
 
 #### Swift registered routing
-In Swift, we all know that Swift does not support annotations, so how to solve Swift dynamic registration routing, we use the runtime traversal in the project to find a routing protocol to automatically register the class.
+In Swift, we all know that Swift does not support annotations, so how to solve the problem of dynamic registration routing in Swift? 
+
+We use the runtime to traverse the self-built classes of the project to find the classes that follow the routing protocol and automatically register them. Automatically exclude system classes for traversal to improve efficiency.
 
 <img src="assets/fetchRouterRegisterClass.png">
 

@@ -171,7 +171,7 @@ TheRouter.logcat { url, logType, errorMsg in
 
 #### Swift 注册形式
  
-Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注册路由该怎么解决呢，我们使用 runtime 遍历工程里的方式找到遵循了路由协议的类进行自动注册。
+Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注册路由该怎么解决呢，我们使用 runtime 遍历工程自建类的方式找到遵循了路由协议的类进行自动注册。自动排除系统类进行遍历，提高效率。
 
 <img src="assets/fetchRouterRegisterClass.png">
 
