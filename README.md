@@ -179,70 +179,33 @@ TheRouter.logcat { url, logType, errorMsg in
 ```
 
 #### Swift registered routing
-In Swift, we all know that Swift does not support annotations, so how to solve Swift dynamic registration routing, we use the runtime traversal in the project to find a routing protocol to automatically register the class.
+In Swift, we all know that Swift does not support annotations, so how to solve the problem of dynamic registration routing in Swift? 
 
-```Swift
-public class func registerRouterMap(_ registerClassPrifxArray: [String], _ urlPath: String, _ userInfo: [String: Any]) -> Any? {
-        
-        let expectedClassCount = objc_getClassList(nil, 0)
-        let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-        let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-        let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
-        
-        var resultXLClass = [AnyClass]()
-        for i in 0 ..< actualClassCount {
-            
-            let currentClass: AnyClass = allClasses[Int(i)]
-            let fullClassName: String = NSStringFromClass(currentClass.self)
-            
-            for value in registerClassPrifxArray {
-                if (fullClassName.containsSubString(substring: value))  {
-                    if currentClass is UIViewController.Type {
-                        resultXLClass.append(currentClass)
-                    }
-                    
-    #if DEBUG
-                    if let clss = currentClass as? CustomRouterInfo.Type {
-                        assert(clss.patternString.hasPrefix("scheme://"), "URL非scheme://开头，请重新确认")
-                        apiArray.append(clss.patternString)
-                        classMapArray.append(clss.routerClass)
-                    }
-    #endif
-                }
-            }
-        }
-        
-        for i in 0 ..< resultXLClass.count {
-            let currentClass: AnyClass = resultXLClass[i]
-            if let cls = currentClass as? TheRouterable.Type {
-                let fullName: String = NSStringFromClass(currentClass.self)
-               
-                for s in 0 ..< cls.patternString.count {
-                    
-                    if fullName.hasPrefix(NSKVONotifyingPrefix) {
-                        let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
-                        let subString = fullName[range]
-                        pagePathMap[cls.patternString[s]] = "\(subString)"
-                        TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
-                    } else {
-                        pagePathMap[cls.patternString[s]] = fullName
-                        TheRouter.addRouterItem(cls.patternString[s], classString: fullName)
-                    }
-                }
-            }
-        }
-        
-#if DEBUG
-        debugPrint(pagePathMap)
-        routerForceRecheck()
-#endif
-        TheRouter.routerLoadStatus(true)
-        return TheRouter.openURL(urlPath, userInfo: userInfo)
-}
-```
-To avoid invalid traversal, we pass registerClassPrifxArray specifying that we traverse the class containing these prefixes. 
-Once it is UIViewController.Type, it is stored and then checked to see if it complies with the TheRouterable protocol. 
-If yes, it is automatically registered. No manual registration required.
+We use the runtime to traverse the self-built classes of the project to find the classes that follow the routing protocol and automatically register them. Automatically exclude system classes for traversal to improve efficiency.
+
+<img src="assets/fetchRouterRegisterClass.png">
+
+In order to avoid invalidity, we can specify that we traverse the classes containing these associations by looking up registerClassPrifxArray. Once it is of type UIViewController.Type, it is stored, and then verified whether it follows the TheRouterable protocol. If it follows, it will be automatically registered. No need to register manually.
+
+Use the objc_copyClassNamesForImage method to find the corresponding class, which is more efficient than objc_getClassList traversal.
+
+Added org.cocoapods filtering, taking into account the componentization scenario, it is determined by external configuration. Developers need to modify the ID of the self-built tree library bundle to be other than org.cocoapods.
+
+The specific viewing URL is as follows:
+
+[Routing performance optimization discussion](https://github.com/HuolalaTech/hll-wp-therouter-ios/issues/9)
+
+## Route cache capability based on version number
+
+<img src="assets/registerList_save.png">
+
+<img src="assets/loadclass_cache.png">
+
+Increased caching capabilities, the same version can be opened again without going through the initial loading process, and the cache registration can be read directly to improve efficiency.
+
+Considering that there will be new routes under the same version during development, reading from the cache will be incorrect, resulting in an inability to jump. We have made logic optimization. 
+
+If the application is currently linked to Xcode and run, the cache will not be used by default, and the caching logic will only be used when outsourcing the package.
 
 #### Lazy load of route registration
  A bad thing about dynamic registration is that it is dynamically registered at startup. 
@@ -569,33 +532,11 @@ public class TheRouterControllerB: TheRouterBController, TheRouterable {
 }
 ```
 
-
 ## How to declare and implement services
 
  The service uses runtime dynamic registration, so you don't have to worry about the service not being registered. Just use it like the above case.
 
-```Swift
-public class func registerServices() {
-    
-    let expectedClassCount = objc_getClassList(nil, 0)
-    let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-    let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-    let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
-    var resultXLClass = [AnyClass]()
-    for i in 0 ..< actualClassCount {
-        
-        let currentClass: AnyClass = allClasses[Int(i)]
-        if (class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil),
-           (class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil),
-           let cls = currentClass as? TheRouterServiceProtocol.Type {
-            print(currentClass)
-            resultXLClass.append(cls)
-            
-            TheRouterServiceManager.default.registerService(named: cls.seriverName, lazyCreator: (cls as! NSObject.Type).init())
-        }
-    }
-}
-```
+ <img src="assets/services_register.png">
 
 ### The route invokes the local service
 

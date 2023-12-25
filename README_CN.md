@@ -171,69 +171,28 @@ TheRouter.logcat { url, logType, errorMsg in
 
 #### Swift 注册形式
  
-Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注册路由该怎么解决呢，我们使用 runtime 遍历工程里的方式找到遵循了路由协议的类进行自动注册。
+Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注册路由该怎么解决呢，我们使用 runtime 遍历工程自建类的方式找到遵循了路由协议的类进行自动注册。自动排除系统类进行遍历，提高效率。
 
-```Swift
-public class func registerRouterMap(_ registerClassPrifxArray: [String], _ urlPath: String, _ userInfo: [String: Any]) -> Any? {
-        
-        let expectedClassCount = objc_getClassList(nil, 0)
-        let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-        let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-        let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
-        
-        var resultXLClass = [AnyClass]()
-        for i in 0 ..< actualClassCount {
-            
-            let currentClass: AnyClass = allClasses[Int(i)]
-            let fullClassName: String = NSStringFromClass(currentClass.self)
-            
-            for value in registerClassPrifxArray {
-                if (fullClassName.containsSubString(substring: value))  {
-                    if currentClass is UIViewController.Type {
-                        resultXLClass.append(currentClass)
-                    }
-                    
-    #if DEBUG
-                    if let clss = currentClass as? CustomRouterInfo.Type {
-                        assert(clss.patternString.hasPrefix("scheme://"), "URL非scheme://开头，请重新确认")
-                        apiArray.append(clss.patternString)
-                        classMapArray.append(clss.routerClass)
-                    }
-    #endif
-                }
-            }
-        }
-        
-        for i in 0 ..< resultXLClass.count {
-            let currentClass: AnyClass = resultXLClass[i]
-            if let cls = currentClass as? TheRouterable.Type {
-                let fullName: String = NSStringFromClass(currentClass.self)
-               
-                for s in 0 ..< cls.patternString.count {
-                    
-                    if fullName.hasPrefix(NSKVONotifyingPrefix) {
-                        let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
-                        let subString = fullName[range]
-                        pagePathMap[cls.patternString[s]] = "\(subString)"
-                        TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
-                    } else {
-                        pagePathMap[cls.patternString[s]] = fullName
-                        TheRouter.addRouterItem(cls.patternString[s], classString: fullName)
-                    }
-                }
-            }
-        }
-        
-#if DEBUG
-        debugPrint(pagePathMap)
-        routerForceRecheck()
-#endif
-        TheRouter.routerLoadStatus(true)
-        return TheRouter.openURL(urlPath, userInfo: userInfo)
-}
-```
+<img src="assets/fetchRouterRegisterClass.png">
 
 为了避免无效遍历，我们通过传入 registerClassPrifxArray 指定我们遍历包含这些前缀的类即可。一旦是 UIViewController.Type 类型就进行存储，然后再进行校验是否遵循 TheRouterable 协议，遵循则自动注册。无需手动注册。
+
+使用 objc_copyClassNamesForImage 方法查找对应的类，比 objc_getClassList 遍历效率更高。 
+
+新增了 org.cocoapods 过滤，考虑到组件化场景下，将会改为外部配置的方式传入。需要开发人员将自建的私有库bundleId修改为不是 org.cocoapods即可。
+
+具体查看网址如下：
+
+[路由性能优化讨论](https://github.com/HuolalaTech/hll-wp-therouter-ios/issues/9)
+
+## 路由根据版本号缓存能力
+
+<img src="assets/registerList_save.png">
+
+<img src="assets/loadclass_cache.png">
+
+增加缓存能力，同一版本再次打开无需走初次加载流程，直接读缓存注册，提升效率。
+考虑到开发中同一个版本下会有新增路由情况，那么从缓存读取就是不正确的，导致无法跳转。我们做了逻辑优化，如果当前正在链接Xcode跑起来的应用，会默认不走缓存，仅当打出包情况下走缓存逻辑。
 
 #### 路由注册的懒加载
 
@@ -611,28 +570,7 @@ final class ConfigModuleService: NSObject, AppConfigServiceProtocol {
 
  服务使用了runtime动态注册，所以你不用担心服务没有注册的问题。只需像上述案例一样使用即可。
  
-```Swift
-public class func registerServices() {
-    
-    let expectedClassCount = objc_getClassList(nil, 0)
-    let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-    let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-    let actualClassCount: Int32 = objc_getClassList(autoreleasingAllClasses, expectedClassCount)
-    var resultXLClass = [AnyClass]()
-    for i in 0 ..< actualClassCount {
-        
-        let currentClass: AnyClass = allClasses[Int(i)]
-        if (class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil),
-           (class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil),
-           let cls = currentClass as? TheRouterServiceProtocol.Type {
-            print(currentClass)
-            resultXLClass.append(cls)
-            
-            TheRouterServiceManager.default.registerService(named: cls.seriverName, lazyCreator: (cls as! NSObject.Type).init())
-        }
-    }
-}
-```
+ <img src="assets/services_register.png">
 
 ### 路由远端调用本地服务：服务接口下发，MQTT,JSBridge
 
@@ -644,7 +582,7 @@ TheRouter.openURL((url, dict))
 
 ## 是否考虑Swift5.9 Macros？
 
- 从目前的实现方式来看，懒加载加上动态注册，已经解决了注册时的性能问题。即使需要遍历全工程的类，然后处理相关逻辑，也不会超过0.2s。之所以能够通过Class取得path，因为给类声明了静态变量。
+ 从目前的实现方式来看，懒加载加上动态注册，已经解决了注册时的性能问题。已经提前获取处理注册然后处理相关逻辑。
  
 ```Swift
 /// 实现TheRouterable协议
@@ -673,4 +611,5 @@ extension TheRouterController: TheRouterable {
 TheRouter 采用Apache2.0协议，详情参考[LICENSE](LICENSE)
 
 ## 交流沟通群
-![](https://i.mji.rip/2023/10/24/bdb63307cdeaabf02b2e9ebc032dd231.jpeg)
+
+<img src="assets/chat_group.JPG">
