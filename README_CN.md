@@ -177,14 +177,18 @@ Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注
 
 为了避免无效遍历，我们通过传入 registerClassPrifxArray 指定我们遍历包含这些前缀的类即可。一旦是 UIViewController.Type 类型就进行存储，然后再进行校验是否遵循 TheRouterable 协议，遵循则自动注册。无需手动注册。
 
+使用 objc_copyClassNamesForImage 方法查找对应的类，比 objc_getClassList 遍历效率更高
+
+新增了 org.cocoapods 过滤，考虑到组件化场景下，将会改为外部配置的方式传入。需要开发人员将自建的私有库bundleId修改为不是 org.cocoapods即可。
+
 ## 路由根据版本号缓存能力
 
 <img src="assets/registerList_save.png">
 
 <img src="assets/loadclass_cache.png">
 
-1. 增加缓存能力，同一版本再次打开无需走初次加载流程，直接读缓存注册，提升效率。
-2. 虑到开发中同一个版本下会有新增路由情况，那么从缓存读取就是不正确的，导致无法跳转。我们做了逻辑优化，如果当前正在链接Xcode跑起来的应用，会默认不走缓存，仅当打出包情况下走缓存逻辑。
+增加缓存能力，同一版本再次打开无需走初次加载流程，直接读缓存注册，提升效率。
+考虑到开发中同一个版本下会有新增路由情况，那么从缓存读取就是不正确的，导致无法跳转。我们做了逻辑优化，如果当前正在链接Xcode跑起来的应用，会默认不走缓存，仅当打出包情况下走缓存逻辑。
 
 #### 路由注册的懒加载
 
