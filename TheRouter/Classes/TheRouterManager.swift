@@ -202,7 +202,7 @@ extension TheRouterManager {
             }
         }
         let endRegisterTime = CFAbsoluteTimeGetCurrent()
-        TheRouter.shareInstance.logcat?("前获取工程中符合路由注册条件的类耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
+        TheRouter.shareInstance.logcat?("提前获取工程中符合路由注册条件的类耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
         writeRouterMapToFile(mapArray: registerRouterList)
         return registerRouterList
     }
