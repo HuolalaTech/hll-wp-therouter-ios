@@ -177,9 +177,13 @@ Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注
 
 为了避免无效遍历，我们通过传入 registerClassPrifxArray 指定我们遍历包含这些前缀的类即可。一旦是 UIViewController.Type 类型就进行存储，然后再进行校验是否遵循 TheRouterable 协议，遵循则自动注册。无需手动注册。
 
-使用 objc_copyClassNamesForImage 方法查找对应的类，比 objc_getClassList 遍历效率更高
+使用 objc_copyClassNamesForImage 方法查找对应的类，比 objc_getClassList 遍历效率更高。 
 
 新增了 org.cocoapods 过滤，考虑到组件化场景下，将会改为外部配置的方式传入。需要开发人员将自建的私有库bundleId修改为不是 org.cocoapods即可。
+
+具体查看网址如下：
+
+[路由性能优化讨论](https://github.com/HuolalaTech/hll-wp-therouter-ios/issues/9)
 
 ## 路由根据版本号缓存能力
 
