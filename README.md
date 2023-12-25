@@ -708,4 +708,4 @@ extension TheRouterController: TheRouterable {
 TheRouter is available under the Apache2.0 license. See the [LICENSE](LICENSE) file for more info.
 
 ## 交流沟通群
-![](https://i.mji.rip/2023/10/24/bdb63307cdeaabf02b2e9ebc032dd231.jpeg)
+<img src="assets/chat_group.JPG">
