@@ -112,10 +112,36 @@ Add the following entry in your Podfile:
 
 ## TheRouter 使用方式
 
-1.  ### 注册
 
- 鉴于已经实现了自动注册能力，开发者无需自己添加路由，只需要进行如下操作即可
 
+### 路由组件初始化
+
+```Swift
+
+// 日志回调，可以监控线上路由运行情况
+TheRouter.logcat { url, logType, errorMsg in
+    debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
+}
+
+ // 提前获取需要注册的路由并缓存本地  The 其实就是工程统一类名前缀，比如demo中的TheRouter.TheRouterController
+TheRouterManager.loadRouterClass([".The"], useCache: true)
+
+// 当调用openUrl时，第一次会回调到这里进行路由的注册，这个不能注释
+TheRouter.lazyRegisterRouterHandle { url, userInfo in
+    // injectRouterServiceConfig 打开H5,远程服务调用使用
+    TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
+    return TheRouterManager.addGloableRouter([".The"], url, userInfo)
+}
+
+// 动态注册服务
+TheRouterManager.registerServices(excludeCocoapods: false)
+```
+
+### 路由注册
+
+#### 自动化注册
+ 鉴于已经实现了自动注册能力，开发者无需自己添加路由，只需要控制器实现TheRouterable协议即可。
+ 
 ```Swift
 /// 实现TheRouterable协议
 extension TheRouterController: TheRouterable {
@@ -137,105 +163,167 @@ extension TheRouterController: TheRouterable {
         TheRouterDefaultPriority
     }
 }
-
-/// 在AppDelegate中实现懒加载的闭包
-// 路由懒加载注册
-
-TheRouterManager.loadRouterClass([".The"], useCache: true)
-
-TheRouter.lazyRegisterRouterHandle { url, userInfo in
-    TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
-    return TheRouterManager.addGloableRouter([".The"], url, userInfo)
-}
-
-// 动态注册服务
-TheRouterManager.registerServices()
-
-// 日志回调，可以监控线上路由运行情况
-TheRouter.logcat { url, logType, errorMsg in
-    debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
-}
 ```
 
-#### OC 注解的形式
-
- 这里列举了OC使用注解的方式，Swift因为其缺乏动态性，是不支持注解的。
- 
-```Objective-C
-//使用注解
-@page(@"home/main")
-- (UIViewController *)homePage{
-    // Do stuff...
-}
-```
-
-#### Swift 注册形式
- 
-Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注册路由该怎么解决呢，我们使用 runtime 遍历工程自建类的方式找到遵循了路由协议的类进行自动注册。自动排除系统类进行遍历，提高效率。
-
-<img src="assets/fetchRouterRegisterClass.png">
-
-为了避免无效遍历，我们通过传入 registerClassPrifxArray 指定我们遍历包含这些前缀的类即可。一旦是 UIViewController.Type 类型就进行存储，然后再进行校验是否遵循 TheRouterable 协议，遵循则自动注册。无需手动注册。
-
-使用 objc_copyClassNamesForImage 方法查找对应的类，比 objc_getClassList 遍历效率更高。 
-
-新增了 org.cocoapods 过滤，考虑到组件化场景下，将会改为外部配置的方式传入。需要开发人员将自建的私有库bundleId修改为不是 org.cocoapods即可。
-
-具体查看网址如下：
-
-[路由性能优化讨论](https://github.com/HuolalaTech/hll-wp-therouter-ios/issues/9)
-
-## 路由根据版本号缓存能力
-
-<img src="assets/registerList_save.png">
-
-<img src="assets/loadclass_cache.png">
-
-增加缓存能力，同一版本再次打开无需走初次加载流程，直接读缓存注册，提升效率。
-考虑到开发中同一个版本下会有新增路由情况，那么从缓存读取就是不正确的，导致无法跳转。我们做了逻辑优化，如果当前正在链接Xcode跑起来的应用，会默认不走缓存，仅当打出包情况下走缓存逻辑。
-
-#### 路由注册的懒加载
-
-采用动态注册有一个不好的情况就是在启动时就去动态注册，在 TheRouter 中注册的时机被延后了，放在了 App 第一次通过 TheRouter.openUrl()时进行注册，会判断路由是否加载完毕，未加载完毕进行加载，然后打开路由。
+#### 手动单个注册
 
 ```Swift
-@discardableResult
-public class func openURL(_ urlString: String, userInfo: [String: Any] = [String: Any](), handler: complateHandler = nil) -> Any? {
-    if urlString.isEmpty {
-        return nil
-    }
-    if !shareInstance.isLoaded {
-        return shareInstance.lazyRegisterHandleBlock?(urlString, userInfo)
-    } else {
-       return openCacheRouter((urlString, userInfo))
-    }
+// 模型模式
+TheRouter.addRouterItem(RouteItem(path: "scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可", className: "TheRouter_Example.TheRouterController", desc: "简单注册,直接调用TheRouter", params: ["key1": 1]))
+// 字典模式
+TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController"])
+// 常量参数模式
+TheRouter.addRouterItem("scheme://router/demo?&desc=简单注册", classString: "TheRouter_Example.TheRouterController")
+// 协议模式， TheRouterApi实现了 CustomRouterInfo协议
+TheRouter.addRouterItem(TheRouterApi.patternString, classString: TheRouterApi.routerClass)
+```
+
+#### 手动批量注册
+
+```Swift
+TheRouter.addRouterItem(["scheme://router/demo": "TheRouter_Example.TheRouterController",
+                    "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
+```
+
+### 路由打开
+
+声明了不同的方法，主要用于明显的区分，内部统一调用 openURL
+
+
+#### 打开路由方式一 垮组件进行调用，使用中间层Api,不依赖其他模块
+
+比如将实现了CustomRouterInfo协议的类放在远端作为底层基础模块，供其他模块调用。
+
+```Swift
+public class TheRouterApi: CustomRouterInfo {
+
+    public static var patternString = "scheme://router/demo"
+    public static var routerClass = "TheRouter_Example.TheRouterController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+
+    public init() {}
 }
 
-// MARK: - Public method
-@discardableResult
-public class func openURL(_ uriTuple: (String, [String: Any]), handler: complateHandler = nil) -> Any? {
-    if !shareInstance.isLoaded {
-        return shareInstance.lazyRegisterHandleBlock?(uriTuple.0, uriTuple.1)
-    } else {
-        return openCacheRouter(uriTuple)
-    }
+public class TheRouterAApi: CustomRouterInfo {
+
+    public static var patternString = "scheme://router/demo1"
+    public static var routerClass = "TheRouter_Example.TheRouterControllerA"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+
+    public init() {}
 }
 
-public class func openCacheRouter(_ uriTuple: (String, [String: Any]), handler: complateHandler = nil) -> Any? {
+TheRouter.openURL(TheRouterApi.init().requiredURL)
+TheRouter.openURL(TheRouterAApi.init().requiredURL)
+```
 
-    if uriTuple.0.isEmpty {
-        return nil
-    }
 
-    if uriTuple.0.contains(shareInstance.serviceHost) {
-        return routerService(uriTuple)
-    } else {
-        return routerJump(uriTuple)
-    }
+#### 打开路由方式二 - scheme+paths+params
+
+```Swift
+TheRouter.openURL("scheme://router/demo9?desc=缓存跳转")
+```
+
+#### 打开路由方式三 - web打开，URL作为参数传递
+
+```Swift
+TheRouter.openWebURL("https://xxxxxxxx")
+```
+
+#### 打开路由方式四- 便利构造器链式打开路由
+
+```Swift
+let model = TheRouterModel.init(name: "AKyS", age: 18)
+TheRouterBuilder.build("scheme://router/demo")
+    .withInt(key: "intValue", value: 2)
+    .withString(key: "stringValue", value: "2222")
+    .withFloat(key: "floatValue", value: 3.1415)
+    .withBool(key: "boolValue", value: false)
+    .withDouble(key: "doubleValue", value: 2.0)
+    .withAny(key: "any", value: model)
+    .navigation()
+    
+TheRouterBuilder.build("scheme://router/demo")
+.withInt(key: "intValue", value: 2)
+.withString(key: "stringValue", value: "sdsd")
+.withFloat(key: "floatValue", value: 3.1415)
+.withBool(key: "boolValue", value: false)
+.withDouble(key: "doubleValue", value: 2.0)
+.withAny(key: "any", value: model)
+.navigation { params, instance in
+    
+}
+```
+### 路由参数如何传递
+
+#### 1. 元祖形式传入路由与追加参数
+
+```Swift
+TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册，动态注册，懒加载动态注册", ["descs": "追加参数"]))
+```
+
+#### 2.参数传递方式
+
+```Swift
+let clouse = { (qrResult: String, qrStatus: Bool) in
+    print("\(qrResult) \(qrStatus)")
+    self.view.makeToast("\(qrResult) \(qrStatus)")
+}
+let model = TheRouterModel.init(name: "AKyS", age: 18)
+TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS", ["model": model, "clouse": clouse]))
+```
+#### 3. 使用实现了CustomRouterInfo协议的对象进行传递
+
+params 即为封装的传递参数
+```Swift
+public class TheRouterC3Api: NSObject, CustomRouterInfo {
+    
+    public static var patternString = "scheme://router/demo3"
+    public static var routerClass = "TheRouter_Example.TheRouterControllerC"
+    public var params: [String: Any] { return ["desc":"如果直接调用TheRouterCApi进行路由跳转，此时路由地址demo33是错误的，无法进行跳转，触发断言，仅当动态下发修复之后才能跳转，测试可以注释TheRouterManager.addRelocationHandle这行代码"] }
+    public var jumpType: LAJumpType = .push
+    
+    public override init() {}
+}
+
+TheRouter.openURL(TheRouterC3Api.init().requiredURL)
+```
+
+### 全局失败映射
+
+```Swift
+TheRouter.globalOpenFailedHandler { info in
+   debugPrint(info)
 }
 ```
 
-#### 如何让 OC 类也享受到 Swift 路由
+### 拦截
+
+比如在未登录情况下统一拦截：跳转消息列表之前先去登录，登录成功之后跳转到消息列表等。
+
+```Swift
+let login = TheRouterLoginApi.templateString
+ TheRouter.addRouterInterceptor([login], priority: 0) { (info) -> Bool in
+       if LALoginManger.shared.isLogin {
+             return true
+       } else {
+             TheRouter.openURL(TheRouterLoginApi().build)
+             return false
+       }
+ }
+```
+
+登录成功之后删除拦截器即可。
+
+### 路由移除
+
+```Swift
+TheRouter.removeRouter(TheRouterViewCApi.patternString)
+```
+
+### 如何让 OC 类也享受到 Swift 路由
 
 这是一个 OC 类的界面，实现路由的跳转需要继承 OC 类，并实现 TheRouterAble 协议即可
 
@@ -277,183 +365,60 @@ public class TheRouterControllerB: TheRouterBController, TheRouterable {
 }
 ```
 
-#### 同时支持手动单个注册
+### 路由根据版本号缓存能力
+
+<img src="assets/registerList_save.png">
+
+<img src="assets/loadclass_cache.png">
+
+增加缓存能力，同一版本再次打开无需走初次加载流程，直接读缓存注册，提升效率。
+考虑到开发中同一个版本下会有新增路由情况，那么从缓存读取就是不正确的，导致无法跳转。我们做了逻辑优化，如果当前正在链接Xcode跑起来的应用，会默认不走缓存，仅当打出包情况下走缓存逻辑。
+
+## 服务的动态注册与调用
+
+### 如何声明服务及实现服务
 
 ```Swift
-// 模型模式
-TheRouter.addRouterItem(RouteItem(path: "scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可", className: "TheRouter_Example.TheRouterController", desc: "简单注册,直接调用TheRouter", params: ["key1": 1]))
-// 字典模式
-TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController"])
-// 常量参数模式
-TheRouter.addRouterItem("scheme://router/demo?&desc=简单注册", classString: "TheRouter_Example.TheRouterController")
-// 协议模式， TheRouterApi实现了 CustomRouterInfo协议
-TheRouter.addRouterItem(TheRouterApi.patternString, classString: TheRouterApi.routerClass)
-```
+@objc
+public protocol AppConfigServiceProtocol: TheRouterServiceProtocol {
+    // 打开小程序
+    func openMiniProgram(info: [String: Any])
+}
 
-#### 同时支持手动批量注册
-
-```Swift
-TheRouter.addRouterItem(["scheme://router/demo": "TheRouter_Example.TheRouterController",
-                    "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
-```
-
-### 移除
-
-```Swift
-TheRouter.removeRouter(TheRouterViewCApi.patternString)
-```
-
-### 打开
-
-声明了不同的方法，主要用于明显的区分，内部统一调用 openURL
-
-便利构造器链式打开路由
-
-```Swift
-let model = TheRouterModel.init(name: "AKyS", age: 18)
-TheRouterBuilder.build("scheme://router/demo")
-    .withInt(key: "intValue", value: 2)
-    .withString(key: "stringValue", value: "2222")
-    .withFloat(key: "floatValue", value: 3.1415)
-    .withBool(key: "boolValue", value: false)
-    .withDouble(key: "doubleValue", value: 2.0)
-    .withAny(key: "any", value: model)
-    .navigation()
+final class ConfigModuleService: NSObject, AppConfigServiceProtocol {
     
-TheRouterBuilder.build("scheme://router/demo")
-.withInt(key: "intValue", value: 2)
-.withString(key: "stringValue", value: "sdsd")
-.withFloat(key: "floatValue", value: 3.1415)
-.withBool(key: "boolValue", value: false)
-.withDouble(key: "doubleValue", value: 2.0)
-.withAny(key: "any", value: model)
-.navigation { params, instance in
+    static var seriverName: String {
+        String(describing: AppConfigServiceProtocol.self)
+    }
     
+    func openMiniProgram(info: [String : Any]) {
+        if let window = UIApplication.shared.delegate?.window {
+            window?.makeToast("打开微信小程序", duration: 1, position: window?.center)
+        }
+    }
 }
-    
-```
 
-打开路由常用方式
+
+```
+### 如何使用服务
 
 ```Swift
-public class TheRouterApi: CustomRouterInfo {
-
-    public static var patternString = "scheme://router/demo"
-    public static var routerClass = "TheRouter_Example.TheRouterController"
-    public var params: [String: Any] { return [:] }
-    public var jumpType: LAJumpType = .push
-
-    public init() {}
-}
-
-public class TheRouterAApi: CustomRouterInfo {
-
-    public static var patternString = "scheme://router/demo1"
-    public static var routerClass = "TheRouter_Example.TheRouterControllerA"
-    public var params: [String: Any] { return [:] }
-    public var jumpType: LAJumpType = .push
-
-    public init() {}
-}
-
-TheRouter.openURL(TheRouterCApi.init().requiredURL)
-TheRouter.openWebURL("https://xxxxxxxx")
-```
-
-```Swift
-
-@discardableResult
-public class func openWebURL(_ uriTuple: (String, [String: Any])) -> Any? {
-    return TheRouter.openURL(uriTuple)
-}
-
-@discardableResult
-public class func openWebURL(_ urlString: String,
-                             userInfo: [String: Any] = [String: Any]()) -> Any? {
-    TheRouter.openURL((urlString, userInfo))
+/// 使用方式
+ if let appConfigService = TheRouter.fetchService(AppConfigServiceProtocol.self){
+     appConfigService.openMiniProgram(info: [:])
 }
 ```
 
-元祖形式传入路由与追加参数
+ 服务使用了runtime动态注册，所以你不用担心服务没有注册的问题。只需像上述案例一样使用即可。
+ 
+ <img src="assets/services_register.png">
+
+### 路由远端调用本地服务：服务接口下发，MQTT,JSBridge
 
 ```Swift
-TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册，动态注册，懒加载动态注册", ["descs": "追加参数"]))
-```
-
-参数传递方式
-
-```Swift
-let clouse = { (qrResult: String, qrStatus: Bool) in
-    print("\(qrResult) \(qrStatus)")
-    self.view.makeToast("\(qrResult) \(qrStatus)")
-}
-let model = TheRouterModel.init(name: "AKyS", age: 18)
-TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS", ["model": model, "clouse": clouse]))
-```
-
-### 全局失败映射
-
-```Swift
-TheRouter.globalOpenFailedHandler { info in
-   debugPrint(info)
-}
-```
-
-### 拦截
-
-比如在未登录情况下统一拦截：跳转消息列表之前先去登录，登录成功之后跳转到消息列表等。
-
-```Swift
-let login = TheRouterLoginApi.templateString
- TheRouter.addRouterInterceptor([login], priority: 0) { (info) -> Bool in
-       if LALoginManger.shared.isLogin {
-             return true
-       } else {
-             TheRouter.openURL(TheRouterLoginApi().build)
-             return false
-       }
- }
-```
-
-登录成功之后删除拦截器即可。
-
-
-### 路由 Path 与类正确安全校验
-
-```Swift
-// MARK: - 客户端强制校验，是否匹配
-public static func routerForceRecheck() {
-    let patternArray = Set(pagePathMap.keys)
-    let apiPathArray = Set(apiArray)
-    let diffArray = patternArray.symmetricDifference(apiPathArray)
-    debugPrint("URL差集：\(diffArray)")
-    debugPrint("pagePathMap：\(pagePathMap)")
-    assert(diffArray.count == 0, "URL 拼写错误，请确认差集中的url是否匹配")
-
-    let patternValueArray = Set(pagePathMap.values)
-    let classPathArray = Set(classMapArray)
-    let diffClassesArray = patternValueArray.symmetricDifference(classPathArray)
-    debugPrint("classes差集：\(diffClassesArray)")
-    assert(diffClassesArray.count == 0, "classes 拼写错误，请确认差集中的class是否匹配")
-}
-```
-
-### 踩坑路由注册-KVO
-
-在进行 classes 本地校验时遇到了类名不匹配问题。
-
-排查原因： 是因为为了避免路由在启动时就注册，影响启动速度，采用了懒加载的方式即第一次打开路由界面的时候才先进行注册然后跳转。但是在我们动态注册之前，某个类因为添加了 KVO (Key-Value Observing 键值监听)，这个类在遍历时 className 修改为了 NSKVONotifying_xxx。需要我们进行特殊处理，如下
-
-```Swift
-/// 对于KVO监听，动态创建子类，需要特殊处理
-public let NSKVONotifyingPrefix = "NSKVONotifying_"
-
-if fullName.hasPrefix(NSKVONotifyingPrefix) {
-    let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
-    let subString = fullName[range]
-    pagePathMap[cls.patternString[s]] = "\(subString)"
-    TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
-}
+let dict = ["ivar1": ["key":"value"]]
+let url = "scheme://services?protocol=AppConfigLAServiceProtocol&method=openMiniProgramWithInfo:&resultType=0"
+TheRouter.openURL((url, dict))
 ```
 
 ## 动态调用路由
@@ -530,59 +495,123 @@ public class TheRouterControllerB: TheRouterBController, TheRouterable {
 let relocationMap = ["routerType": 2, "className": "TheRouter_Example.TheRouterControllerD", "path": "scheme://router/demo5"] as NSDictionary
 TheRouterManager.addRelocationHandle(routerMapList: [relocationMap])
 TheRouter.openURL("scheme://router/demo2Android?desc=demo5是Android一个界面的path,为了双端统一，我们动态增加一个path,这样远端下发时demo5也就能跳转了")
-
 ```
 
-## 服务的动态注册与调用
+## 实现如上功能的细节介绍
 
-### 如何声明服务及实现服务
+#### OC注解的形式
 
-```Swift
-@objc
-public protocol AppConfigServiceProtocol: TheRouterServiceProtocol {
-    // 打开小程序
-    func openMiniProgram(info: [String: Any])
-}
-
-final class ConfigModuleService: NSObject, AppConfigServiceProtocol {
-    
-    static var seriverName: String {
-        String(describing: AppConfigServiceProtocol.self)
-    }
-    
-    func openMiniProgram(info: [String : Any]) {
-        if let window = UIApplication.shared.delegate?.window {
-            window?.makeToast("打开微信小程序", duration: 1, position: window?.center)
-        }
-    }
-}
-
-
-```
-### 如何使用服务
-
-```Swift
-/// 使用方式
- if let appConfigService = TheRouter.fetchService(AppConfigServiceProtocol.self){
-     appConfigService.openMiniProgram(info: [:])
-}
-```
-
- 服务使用了runtime动态注册，所以你不用担心服务没有注册的问题。只需像上述案例一样使用即可。
+ 这里列举了OC使用注解的方式，Swift因为其缺乏动态性，是不支持注解的。
  
- <img src="assets/services_register.png">
+```Objective-C
+//使用注解
+@page(@"home/main")
+- (UIViewController *)homePage{
+    // Do stuff...
+}
+```
 
-### 路由远端调用本地服务：服务接口下发，MQTT,JSBridge
+#### Swift 注册形式
+ 
+Swift 中，我们都知道 Swift 是不支持注解的，那么 Swift 动态注册路由该怎么解决呢，我们使用 runtime 遍历工程自建类的方式找到遵循了路由协议的类进行自动注册。自动排除系统类进行遍历，提高效率。
+
+<img src="assets/fetchRouterRegisterClass.png">
+
+为了避免无效遍历，我们通过传入 registerClassPrifxArray 指定我们遍历包含这些前缀的类即可。一旦是 UIViewController.Type 类型就进行存储，然后再进行校验是否遵循 TheRouterable 协议，遵循则自动注册。无需手动注册。
+
+使用 objc_copyClassNamesForImage 方法查找对应的类，比 objc_getClassList 遍历效率更高。 
+
+新增了 org.cocoapods 过滤，考虑到组件化场景下，将会改为外部配置的方式传入。需要开发人员将自建的私有库bundleId修改为不是 org.cocoapods即可。
+
+具体查看网址如下：
+
+[路由性能优化讨论](https://github.com/HuolalaTech/hll-wp-therouter-ios/issues/9)
+
+#### 路由注册的懒加载
+
+采用动态注册有一个不好的情况就是在启动时就去动态注册，在 TheRouter 中注册的时机被延后了，放在了 App 第一次通过 TheRouter.openUrl()时进行注册，会判断路由是否加载完毕，未加载完毕进行加载，然后打开路由。
 
 ```Swift
-let dict = ["ivar1": ["key":"value"]]
-let url = "scheme://services?protocol=AppConfigLAServiceProtocol&method=openMiniProgramWithInfo:&resultType=0"
-TheRouter.openURL((url, dict))
+@discardableResult
+public class func openURL(_ urlString: String, userInfo: [String: Any] = [String: Any](), handler: complateHandler = nil) -> Any? {
+    if urlString.isEmpty {
+        return nil
+    }
+    if !shareInstance.isLoaded {
+        return shareInstance.lazyRegisterHandleBlock?(urlString, userInfo)
+    } else {
+       return openCacheRouter((urlString, userInfo))
+    }
+}
+
+// MARK: - Public method
+@discardableResult
+public class func openURL(_ uriTuple: (String, [String: Any]), handler: complateHandler = nil) -> Any? {
+    if !shareInstance.isLoaded {
+        return shareInstance.lazyRegisterHandleBlock?(uriTuple.0, uriTuple.1)
+    } else {
+        return openCacheRouter(uriTuple)
+    }
+}
+
+public class func openCacheRouter(_ uriTuple: (String, [String: Any]), handler: complateHandler = nil) -> Any? {
+
+    if uriTuple.0.isEmpty {
+        return nil
+    }
+
+    if uriTuple.0.contains(shareInstance.serviceHost) {
+        return routerService(uriTuple)
+    } else {
+        return routerJump(uriTuple)
+    }
+}
+```
+
+
+#### 路由 Path 与类正确安全校验
+
+为了避免线上出现问题，这里使用了强制的匹配，要求实现CustomRouterInfo协议的类与实现TheRouterable协议的类数量保持一致。不一致直接触发断言。
+
+```Swift
+// MARK: - 客户端强制校验，是否匹配
+public static func routerForceRecheck() {
+    let patternArray = Set(pagePathMap.keys)
+    let apiPathArray = Set(apiArray)
+    let diffArray = patternArray.symmetricDifference(apiPathArray)
+    debugPrint("URL差集：\(diffArray)")
+    debugPrint("pagePathMap：\(pagePathMap)")
+    assert(diffArray.count == 0, "URL 拼写错误，请确认差集中的url是否匹配")
+
+    let patternValueArray = Set(pagePathMap.values)
+    let classPathArray = Set(classMapArray)
+    let diffClassesArray = patternValueArray.symmetricDifference(classPathArray)
+    debugPrint("classes差集：\(diffClassesArray)")
+    assert(diffClassesArray.count == 0, "classes 拼写错误，请确认差集中的class是否匹配")
+}
+```
+
+#### 踩坑路由注册-KVO
+
+在进行 classes 本地校验时遇到了类名不匹配问题。
+
+排查原因： 是因为为了避免路由在启动时就注册，影响启动速度，采用了懒加载的方式即第一次打开路由界面的时候才先进行注册然后跳转。但是在我们动态注册之前，某个类因为添加了 KVO (Key-Value Observing 键值监听)，这个类在遍历时 className 修改为了 NSKVONotifying_xxx。需要我们进行特殊处理，如下
+
+```Swift
+/// 对于KVO监听，动态创建子类，需要特殊处理
+public let NSKVONotifyingPrefix = "NSKVONotifying_"
+
+if fullName.hasPrefix(NSKVONotifyingPrefix) {
+    let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
+    let subString = fullName[range]
+    pagePathMap[cls.patternString[s]] = "\(subString)"
+    TheRouter.addRouterItem(cls.patternString[s], classString: "\(subString)")
+}
 ```
 
 ## 是否考虑Swift5.9 Macros？
 
- 从目前的实现方式来看，懒加载加上动态注册，已经解决了注册时的性能问题。已经提前获取处理注册然后处理相关逻辑。
+ 从目前的实现方式来看，懒加载加上动态注册，已经解决了注册时的性能问题。已经提前获取处理注册然后处理相关逻辑。当然，不排除会支持。
  
 ```Swift
 /// 实现TheRouterable协议
