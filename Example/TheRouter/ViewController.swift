@@ -116,9 +116,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             TheRouter.addRouterItem("scheme://router/demo?&desc=简单注册", classString: "TheRouter_Example.TheRouterController")
             TheRouter.addRouterItem(TheRouterApi.patternString, classString: TheRouterApi.routerClass)
             TheRouter.addRouterItem(TheRouterAApi.patternString, classString: TheRouterAApi.routerClass)
-            TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册字典形式，动态注册TheRouterManager.addGloableRouter，懒加载动态注册 TheRouter.lazyRegisterRouterHandle ")
             TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController",
                                      "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
+            TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册字典形式，动态注册TheRouterManager.addGloableRouter，懒加载动态注册 TheRouter.lazyRegisterRouterHandle ")
             
         case 1:
             TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=动态注册使用runtime遍历工程类，将路由path与对应的class映射进行存储，进行跳转时，映射解析跳转详情查看Function: TheRouterManager.addGloableRouter")
@@ -154,6 +154,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         switch indexPath.row {
         case 0:
             TheRouter.openURL("scheme://router/demo")
+            TheRouter.openURL(TheRouterApi().requiredURL)
+            TheRouter.openURL(TheRouterC3Api().requiredURL)
         case 1:
             TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")
         case 2:
