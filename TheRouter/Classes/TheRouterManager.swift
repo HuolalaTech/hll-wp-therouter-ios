@@ -223,16 +223,16 @@ extension TheRouterManager {
             if let id = identifier as? String {
                 if excludeCocoapods {
                     if  id.hasPrefix(kSAppleSuffix) || id.hasPrefix(kSCocoaPodsSuffix) {
-                        break
+                        continue
                     }
                 } else {
                     if  id.hasPrefix(kSAppleSuffix) {
-                        break
+                        continue
                     }
                 }
             }
             
-            let execURL = CFBundleCopyExecutableURL(bundle) as NSURL
+            guard let execURL = CFBundleCopyExecutableURL(bundle) as NSURL? else { continue }
             let imageURL = execURL.fileSystemRepresentation
             let classCount = UnsafeMutablePointer<UInt32>.allocate(capacity: MemoryLayout<UInt32>.stride)
             guard let classNames = objc_copyClassNamesForImage(imageURL, classCount) else {
@@ -271,16 +271,16 @@ extension TheRouterManager {
             if let id = identifier as? String {
                 if excludeCocoapods {
                     if  id.hasPrefix(kSAppleSuffix) || id.hasPrefix(kSCocoaPodsSuffix) {
-                        break
+                        continue
                     }
                 } else {
                     if  id.hasPrefix(kSAppleSuffix) {
-                        break
+                        continue
                     }
                 }
             }
             
-            let execURL = CFBundleCopyExecutableURL(bundle) as NSURL
+            guard let execURL = CFBundleCopyExecutableURL(bundle) as NSURL? else { continue }
             let imageURL = execURL.fileSystemRepresentation
             let classCount = UnsafeMutablePointer<UInt32>.allocate(capacity: MemoryLayout<UInt32>.stride)
             guard let classNames = objc_copyClassNamesForImage(imageURL, classCount) else {
