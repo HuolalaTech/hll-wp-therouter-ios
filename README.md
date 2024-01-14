@@ -110,7 +110,7 @@ In order to keep consistent with the Android side, the URL and class registratio
 Add the following entry in your Podfile:
 
 ```ruby
-   pod 'TheRouter', '1.1.3'
+   pod 'TheRouter', '1.1.4'
 ```
 
 ## Swift Restricted version

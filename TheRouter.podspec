@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TheRouter'
-  s.version          = '1.1.3'
+  s.version          = '1.1.4'
   s.summary          = 'TheRouter一个用于模块间解耦和通信，基于Swift协议进行动态懒加载注册路由与打开路由的工具。同时支持通过Service-Protocol寻找对应的模块，并用 protocol进行依赖注入和模块通信。'
 
 # This description is used to generate tags and improve search results.
