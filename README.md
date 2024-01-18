@@ -147,24 +147,23 @@ extension TheRouterController: TheRouterable {
    }
 }
 
-/// 在AppDelegate中实现懒加载的闭包
-// 路由懒加载注册
-
-TheRouterManager.loadRouterClass([".The"], useCache: true)
-
-TheRouter.lazyRegisterRouterHandle { url, userInfo in
-    TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
-    return TheRouterManager.addGloableRouter([".The"], url, userInfo)
-}
-
-// 动态注册服务
-TheRouterManager.registerServices()
-
 // 日志回调，可以监控线上路由运行情况
 TheRouter.logcat { url, logType, errorMsg in
     debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
 }
 
+ // 提前获取需要注册的路由并缓存本地  The 其实就是工程统一类名前缀，比如demo中的TheRouter.TheRouterController
+TheRouterManager.loadRouterClass([".The"], useCache: true)
+
+// 当调用openUrl时，第一次会回调到这里进行路由的注册，这个不能注释
+TheRouter.lazyRegisterRouterHandle { url, userInfo in
+    // injectRouterServiceConfig 打开H5,远程服务调用使用
+    TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
+    return TheRouterManager.addGloableRouter([".The"], true, url, userInfo)
+}
+
+// 动态注册服务
+TheRouterManager.registerServices(excludeCocoapods: false)
 ```
 
  #### OC The form of the annotation

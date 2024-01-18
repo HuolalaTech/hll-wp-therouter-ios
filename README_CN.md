@@ -130,7 +130,7 @@ TheRouterManager.loadRouterClass([".The"], useCache: true)
 TheRouter.lazyRegisterRouterHandle { url, userInfo in
     // injectRouterServiceConfig 打开H5,远程服务调用使用
     TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
-    return TheRouterManager.addGloableRouter([".The"], url, userInfo)
+    return TheRouterManager.addGloableRouter([".The"], true, url, userInfo)
 }
 
 // 动态注册服务
