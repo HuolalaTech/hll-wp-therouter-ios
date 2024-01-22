@@ -433,3 +433,23 @@ public class TheRouterE34Api:NSObject, CustomRouterInfo {
     
     public override init() {}
 }
+
+public class TheRouterLAApi:NSObject, CustomRouterInfo {
+    
+    public static var patternString = "scheme://router/class_prex_test"
+    public static var routerClass = "TheRouter_Example.LARouterController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+    
+    public override init() {}
+}
+
+public class TheRouterAnyPrifxApi:NSObject, CustomRouterInfo {
+    
+    public static var patternString = "scheme://router/anyClass_prex_test"
+    public static var routerClass = "TheRouter_Example.AnyPrifxClassTestController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+    
+    public override init() {}
+}

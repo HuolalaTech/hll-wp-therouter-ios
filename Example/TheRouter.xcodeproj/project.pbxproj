@@ -26,6 +26,8 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		B4C21EFE5B0ABE82F3498107 /* Pods_TheRouter_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD1C616AE5833A562B960C6C /* Pods_TheRouter_Example.framework */; };
+		F0750B142B5EA112003FD724 /* LARouterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0750B132B5EA112003FD724 /* LARouterController.swift */; };
+		F0750B162B5EA72A003FD724 /* AnyPrifxClassTestController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0750B152B5EA72A003FD724 /* AnyPrifxClassTestController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +72,8 @@
 		A743C1781FB56171B383C18A /* Pods-TheRouter_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheRouter_Example.release.xcconfig"; path = "Target Support Files/Pods-TheRouter_Example/Pods-TheRouter_Example.release.xcconfig"; sourceTree = "<group>"; };
 		B79F8205362B05ED97B22883 /* Pods_TheRouter_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheRouter_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD1C616AE5833A562B960C6C /* Pods_TheRouter_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheRouter_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0750B132B5EA112003FD724 /* LARouterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LARouterController.swift; sourceTree = "<group>"; };
+		F0750B152B5EA72A003FD724 /* AnyPrifxClassTestController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyPrifxClassTestController.swift; sourceTree = "<group>"; };
 		FF1C0100BC70EE123DBECCBE /* Pods-TheRouter_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheRouter_Tests.release.xcconfig"; path = "Target Support Files/Pods-TheRouter_Tests/Pods-TheRouter_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -135,6 +139,8 @@
 				1C839B992AA6F67A00726596 /* TheRouterController.swift */,
 				1C839B922AA6F67A00726596 /* TheRouterControllerA.swift */,
 				1C839B962AA6F67A00726596 /* TheRouterControllerB.swift */,
+				F0750B132B5EA112003FD724 /* LARouterController.swift */,
+				F0750B152B5EA72A003FD724 /* AnyPrifxClassTestController.swift */,
 				1C839B8E2AA6F67A00726596 /* TheRouterControllerC.swift */,
 				1C839B982AA6F67A00726596 /* TheRouterControllerD.swift */,
 				1C41F0142B0DD792002E2F24 /* TheRouterControllerE.swift */,
@@ -372,8 +378,10 @@
 				1C839BA62AA6F67A00726596 /* TheRouterController.swift in Sources */,
 				1C839B9C2AA6F67A00726596 /* TheRouterControllerC.swift in Sources */,
 				1C839BA02AA6F67A00726596 /* TheRouterControllerA.swift in Sources */,
+				F0750B162B5EA72A003FD724 /* AnyPrifxClassTestController.swift in Sources */,
 				1C839BA72AA6F67A00726596 /* AppConfigServices.swift in Sources */,
 				1C839B9B2AA6F67A00726596 /* TheRouterModel.swift in Sources */,
+				F0750B142B5EA112003FD724 /* LARouterController.swift in Sources */,
 				1C839BA22AA6F67A00726596 /* AppDelegate.swift in Sources */,
 				1C41F0152B0DD793002E2F24 /* TheRouterControllerE.swift in Sources */,
 				1C839BA32AA6F67A00726596 /* TheRouterControllerB.swift in Sources */,

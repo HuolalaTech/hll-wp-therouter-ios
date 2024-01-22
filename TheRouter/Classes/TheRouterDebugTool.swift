@@ -23,7 +23,7 @@ public class TheRouterDebugTool {
         sysctl(mib, 4, &info, &size, nil, 0)
         //info.kp_proc.p_flag中存放的是标志位（二进制），在proc.h文件中有p_flag的宏定义，通过&运算可知对应标志位的值是否为0。（若结果值为0则对应标志位为0）。其中P_TRACED为正在跟踪调试过程。
         if (info.unsafelyUnwrapped.kp_proc.p_flag & P_TRACED) > 0 {
-            //监听到被调试，退出程序
+            //监听到被调试
             return true
         }
         return false
