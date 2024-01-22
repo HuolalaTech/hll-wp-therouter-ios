@@ -103,7 +103,7 @@
 Add the following entry in your Podfile:
 
 ```ruby
-   pod 'TheRouter', '1.1.4'
+   pod 'TheRouter', '1.1.5'
 ```
 
 ## Swift限制版本
