@@ -153,9 +153,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func openRouter(indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            TheRouter.openURL("scheme://router/demo")
-            TheRouter.openURL(TheRouterApi().requiredURL)
-            TheRouter.openURL(TheRouterC3Api().requiredURL)
+//            TheRouter.openURL("scheme://router/demo")
+//            TheRouter.openURL(TheRouterApi().requiredURL)
+//            TheRouter.openURL(TheRouterC3Api().requiredURL)
+            TheRouter.openURL(TheRouterLAApi().requiredURL)
         case 1:
             TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")
         case 2:

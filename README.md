@@ -48,7 +48,7 @@
 | 16 | 支持链式调用打开路由回调闭包 | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation(_ complateHandler: ComplateHandler = nil) |
 | 17 | 支持非链式调用打开路由回调闭包 | TheRouter.openURL("https://therouter.cn/" ) { param, instance in } |
 | 18 | 增加异步获取符合条件注册类 | TheRouterManager.fetchRouterRegisterClass() |
-| 19 | 增加路由本地缓存能力 | TheRouterManager.fetchRouterRegisterClass([.The], userCache: true) |
+| 19 | 增加路由本地缓存能力 | TheRouterManager.fetchRouterRegisterClass(excludeCocoapods: true, userCache: true) |
 
 # 背景
 随着项目需求的日益增加，开发人员的不断增加，带来了很多问题：
@@ -125,14 +125,23 @@ TheRouter.logcat { url, logType, errorMsg in
     debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
 }
 
+// 路由懒加载注册,
+// - excludeCocoapods: 是否对Cocoapods生成的组件进行动态注册
+// - excludeCocoapods = true 不对Cocoapods生成的组件进行动态注册， false 对Cocoapods生成的组件也进行遍历动态注册
+// - useCache: 是否开启本地缓存功能
  // 提前获取需要注册的路由并缓存本地  The 其实就是工程统一类名前缀，比如demo中的TheRouter.TheRouterController
-TheRouterManager.loadRouterClass([".The"], useCache: true)
+TheRouterManager.loadRouterClass(excludeCocoapods: true, useCache: true)
 
-// 当调用openUrl时，第一次会回调到这里进行路由的注册，这个不能注释
 TheRouter.lazyRegisterRouterHandle { url, userInfo in
-    // injectRouterServiceConfig 打开H5,远程服务调用使用
     TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
-    return TheRouterManager.addGloableRouter([".The"], true, url, userInfo)
+    /// - Parameters:
+    ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    ///   - urlPath: 将要打开的路由path
+    ///   - userInfo: 路由传递的参数
+    ///   - forceCheckEnable: 是否支持强制校验，强制校验要求Api声明与对应的类必须实现TheRouterAble协议
+    ///   - forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开
+    return TheRouterManager.addGloableRouter(true, url, userInfo, forceCheckEnable: true)
 }
 
 // 动态注册服务
@@ -142,7 +151,7 @@ TheRouterManager.registerServices(excludeCocoapods: false)
 ### 路由注册
 
 #### 自动化注册
- 鉴于已经实现了自动注册能力，开发者无需自己添加路由，只需要控制器实现TheRouterable协议即可。
+ 鉴于已经实现了自动注册能力，开发者无需自己添加路由，只需要控制器实现TheRouterable协议即可。当然你想手动注册路由也可以。
  
 ```Swift
 /// 实现TheRouterable协议

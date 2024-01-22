@@ -27,12 +27,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSLog("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
         }
         
-        // 路由懒加载注册
-        TheRouterManager.loadRouterClass([".The"], true, useCache: true)
+        // 路由懒加载注册,
+        // - excludeCocoapods: 是否对Cocoapods生成的组件进行动态注册
+        // - excludeCocoapods = true 不对Cocoapods生成的组件进行动态注册， false 对Cocoapods生成的组件也进行遍历动态注册
+        // - useCache: 是否开启本地缓存功能
+        TheRouterManager.loadRouterClass(excludeCocoapods: true, useCache: true)
         
         TheRouter.lazyRegisterRouterHandle { url, userInfo in
             TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)
-            return TheRouterManager.addGloableRouter([".The"], true, url, userInfo)
+            /// - Parameters:
+            ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+            ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+            ///   - urlPath: 将要打开的路由path
+            ///   - userInfo: 路由传递的参数
+            ///   - forceCheckEnable: 是否支持强制校验，强制校验要求Api声明与对应的类必须实现TheRouterAble协议
+            ///   - forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开
+            return TheRouterManager.addGloableRouter(true, url, userInfo, forceCheckEnable: true)
         }
             
         // 动态注册服务

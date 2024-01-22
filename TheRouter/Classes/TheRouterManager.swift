@@ -23,13 +23,21 @@ public let kSCocoaPodsSuffix = "org.cocoapods"
 public class TheRouterManager: NSObject {
     
     static public let shareInstance = TheRouterManager()
+    
     // 是否使用缓存
     public var useCache: Bool = false
+    
     // MARK: - 注册路由
-    public static func addGloableRouter(_ registerClassPrifxArray: [String],
-                                        _ excludeCocoapods: Bool = false,
+    /// - Parameters:
+    ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    ///   - urlPath: 将要打开的路由path
+    ///   - userInfo: 路由传递的参数
+    ///   - forceCheckEnable: 是否支持强制校验，强制校验要求Api声明与对应的类必须实现TheRouterAble协议
+    public static func addGloableRouter(_ excludeCocoapods: Bool = false,
                                         _ urlPath: String,
-                                        _ userInfo: [String: Any]) -> Any? {
+                                        _ userInfo: [String: Any],
+                                        forceCheckEnable: Bool = false) -> Any? {
         
         TheRouter.globalOpenFailedHandler { (info) in
             guard let matchFailedKey = info[TheRouter.matchFailedKey] as? String else { return }
@@ -37,7 +45,7 @@ public class TheRouterManager: NSObject {
             TheRouter.shareInstance.logcat?("TheRouter: globalOpenFailedHandler", .logError, "\(matchFailedKey)")
         }
         
-        return TheRouterManager.registerRouterMap(registerClassPrifxArray, excludeCocoapods, urlPath, userInfo)
+        return TheRouterManager.registerRouterMap(excludeCocoapods, urlPath, userInfo, forceCheckEnable: forceCheckEnable)
     }
     
     // MARK: -注册web与服务调用
@@ -56,20 +64,20 @@ extension TheRouterManager {
     // MARK: - 自动注册路由
     /// 获取符合注册条件的路由类
     /// - Parameters:
-    ///   - registerClassPrifxArray: 工程中类开始的名称
     ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     ///   - urlPath: 将要打开的路由path
     ///   - userInfo: 路由传递的参数
-    public class func registerRouterMap(_ registerClassPrifxArray: [String],
-                                        _ excludeCocoapods: Bool = false,
+    ///   - forceCheckEnable: 是否支持强制校验，强制校验要求Api声明与对应的类必须实现TheRouterAble协议
+    public class func registerRouterMap(_ excludeCocoapods: Bool = false,
                                         _ urlPath: String,
-                                        _ userInfo: [String: Any]) -> Any? {
+                                        _ userInfo: [String: Any],
+                                        forceCheckEnable: Bool = false) -> Any? {
         
         let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         
         if registerRouterList.isEmpty {
-            registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray, excludeCocoapods)
+            registerRouterList = self.fetchRouterRegisterClass(excludeCocoapods)
         }
         for item in registerRouterList {
             var priority: UInt32 = 0
@@ -85,25 +93,26 @@ extension TheRouterManager {
         } else {
             TheRouter.shareInstance.logcat?("未使用缓存注册路由耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
         }
+        if forceCheckEnable {
 #if DEBUG
-        routerForceRecheck(registerClassPrifxArray, excludeCocoapods)
+           routerForceRecheck(excludeCocoapods)
 #endif
+        }
+
         return TheRouter.openURL(urlPath, userInfo: userInfo)
     }
     
     
     /// 获取符合注册条件的路由类
     /// - Parameters:
-    ///   - registerClassPrifxArray: 工程中类开始的名称
-    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     ///   - useCache: 是否使用本地缓存
-    public class func loadRouterClass(_ registerClassPrifxArray: [String],
-                                      _ excludeCocoapods: Bool = false,
+    public class func loadRouterClass(excludeCocoapods: Bool = false,
                                       useCache: Bool = false) {
         TheRouterManager.shareInstance.useCache = useCache
         if TheRouterDebugTool.checkTracing() || !useCache {
-            registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray, excludeCocoapods)
+            registerRouterList = self.fetchRouterRegisterClass(excludeCocoapods)
         } else {
             let cachePath = fetchCurrentVersionRouterCachePath()
             let fileExists = fileExists(atPath: cachePath)
@@ -115,7 +124,7 @@ extension TheRouterManager {
             if useCache && fileExists && !cacheData.isEmpty {
                 registerRouterList = cacheData
             } else {
-                registerRouterList = self.fetchRouterRegisterClass(registerClassPrifxArray, excludeCocoapods)
+                registerRouterList = self.fetchRouterRegisterClass(excludeCocoapods)
             }
         }
     }
@@ -123,12 +132,10 @@ extension TheRouterManager {
     
     // MARK: - 提前获取工程中符合路由注册条件的类
     /// - Parameters:
-    ///   - registerClassPrifxArray: 工程中类开始的名称
     ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     ///   - useCache: 是否使用本地缓存
-    public class func fetchRouterRegisterClass(_ registerClassPrifxArray: [String],
-                                               _ excludeCocoapods: Bool = false,
+    public class func fetchRouterRegisterClass(_ excludeCocoapods: Bool = false,
                                                _ localCache: Bool = false) -> [[String: String]] {
         let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         
@@ -213,8 +220,7 @@ extension TheRouterManager {
     ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     ///   - useCache: 是否使用本地缓存
-    class func runtimeRouterList(_ registerClassPrifxArray: [String],
-                                 _ excludeCocoapods: Bool = false) {
+    class func runtimeRouterList(_ excludeCocoapods: Bool = false) {
         
         let bundles = CFBundleGetAllBundles() as? [CFBundle]
         for bundle in bundles ?? [] {
@@ -245,14 +251,11 @@ extension TheRouterManager {
                     continue
                 }
                 
-                for value in registerClassPrifxArray {
-                    if class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil,
-                       class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil,
-                       (currentClassName.containsSubString(substring: value))  {
-                        if let clss = currentClass as? CustomRouterInfo.Type {
-                            apiArray.append(clss.patternString)
-                            classMapArray.append(clss.routerClass)
-                        }
+                if class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil,
+                   class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil  {
+                    if let clss = currentClass as? CustomRouterInfo.Type {
+                        apiArray.append(clss.patternString)
+                        classMapArray.append(clss.routerClass)
                     }
                 }
             }
@@ -361,9 +364,8 @@ extension TheRouterManager {
     }
     
     // MARK: - 客户端强制校验，是否匹配
-    public static func routerForceRecheck(_ registerClassPrifxArray: [String],
-                                          _ excludeCocoapods: Bool = false) {
-        TheRouterManager.runtimeRouterList(registerClassPrifxArray, excludeCocoapods)
+    public static func routerForceRecheck(_ excludeCocoapods: Bool = false) {
+        TheRouterManager.runtimeRouterList(excludeCocoapods)
         let paths = registerRouterList.compactMap { $0[TheRouterPath] }
         let patternArray = Set(paths)
         let apiPathArray = Set(apiArray)
