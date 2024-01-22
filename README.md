@@ -48,7 +48,7 @@
 | 16 | 支持链式调用打开路由回调闭包 | TheRouterBuilder.build("scheme://router/demo").withInt(key: "intValue", value: 2).navigation(_ complateHandler: ComplateHandler = nil) |
 | 17 | 支持非链式调用打开路由回调闭包 | TheRouter.openURL("https://therouter.cn/" ) { param, instance in } |
 | 18 | 增加异步获取符合条件注册类 | TheRouterManager.fetchRouterRegisterClass() |
-| 19 | 增加路由本地缓存能力 | TheRouterManager.fetchRouterRegisterClass([.The], userCache: true) |
+| 19 | 增加路由本地缓存能力 | TheRouterManager.fetchRouterRegisterClass(excludeCocoapods: true, userCache: true) |
 
 # 背景
 随着项目需求的日益增加，开发人员的不断增加，带来了很多问题：
