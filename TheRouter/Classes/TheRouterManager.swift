@@ -64,7 +64,7 @@ extension TheRouterManager {
     // MARK: - 自动注册路由
     /// 获取符合注册条件的路由类
     /// - Parameters:
-    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     ///   - urlPath: 将要打开的路由path
     ///   - userInfo: 路由传递的参数
@@ -216,10 +216,8 @@ extension TheRouterManager {
     
     // MARK: - 如果使用本地缓存，需要再次动态获取注册类来进行debug环境下的一致性教研
     /// - Parameters:
-    ///   - registerClassPrifxArray: 工程中类开始的名称
-    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
-    ///   - useCache: 是否使用本地缓存
     class func runtimeRouterList(_ excludeCocoapods: Bool = false) {
         
         let bundles = CFBundleGetAllBundles() as? [CFBundle]
@@ -264,7 +262,7 @@ extension TheRouterManager {
     
     // MARK: - 自动注册服务
     /// 自动注册服务
-    /// - Parameter excludeBundleIdentifier:排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是 org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+    /// - Parameter excludeCocoapods:排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是 org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     public class func registerServices(excludeCocoapods: Bool = false) {
         let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         let bundles = CFBundleGetAllBundles() as? [CFBundle]
