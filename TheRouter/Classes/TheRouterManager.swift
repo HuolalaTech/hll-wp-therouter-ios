@@ -132,7 +132,7 @@ extension TheRouterManager {
     
     // MARK: - 提前获取工程中符合路由注册条件的类
     /// - Parameters:
-    ///   - excludeBundleIdentifier: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+    ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     ///   - useCache: 是否使用本地缓存
     public class func fetchRouterRegisterClass(_ excludeCocoapods: Bool = false,
