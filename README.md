@@ -32,7 +32,7 @@
 |:----|:---:|:---:|
 | 1 | 懒加载路由 | lazyRegisterRouterHandle  仅当第一次调用OpenURL时进行动态注册|
 | 2 | 发挥Swift特性，面向协议编程 | TheRouterServiceProtocol TheRouterableProtocol |
-| 3 | 动态注册，无需手动注册 | TheRouterManager.addGloableRouter([".LA"], url, userInfo) |
+| 3 | 动态注册，无需手动注册 | TheRouterManager.addGloableRouter(true, url, userInfo, forceCheckEnable: true) |
 | 4 | 支持依赖注入与服务的自动注册 | TheRouter.registerServices()  TheRouterServiceManager.registerService(serviceName)|
 | 5 | 服务的动态注册与协议方式调用| TheRouter.fetchService(AppConfigServiceProtocol.self) |
 | 6 | 支持单模块独立初始化| ModuleProtocol moduleSetUp() |
