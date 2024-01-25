@@ -1,0 +1,6 @@
+framework module Pods_TheRouter_ObjectiveCDemo {
+  umbrella header "Pods-TheRouter-ObjectiveCDemo-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,20 @@
+PODS:
+  - TheRouter (1.1.5)
+  - Toast (4.0.0)
+
+DEPENDENCIES:
+  - TheRouter (= 1.1.5)
+  - Toast (= 4.0.0)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - TheRouter
+    - Toast
+
+SPEC CHECKSUMS:
+  TheRouter: 00d0b05bd06b5cf6e7df1ef00f0ebc92ee9c954a
+  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
+
+PODFILE CHECKSUM: 5f94f01c46f6a0697f0571b2d52c4474f6af608b
+
+COCOAPODS: 1.13.0
