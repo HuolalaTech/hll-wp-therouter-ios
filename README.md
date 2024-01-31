@@ -1,13 +1,11 @@
 ![](https://therouter.cn/assets/img/logo/logo4.png)
 
-# TheRouter
-
 [![**license**](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![**Platform**](https://img.shields.io/badge/platform-iOS-blue.svg)]()
 [![**Language**](https://img.shields.io/badge/language-Swift-orange.svg)]()
 [![**wiki**](https://img.shields.io/badge/Wiki-open-brightgreen.svg)](https://juejin.cn/user/1768489241815070)
 
-> [英文文档](README_CN.md)
+iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中文官网](https://therouter.cn) | [英文官网](https://en.therouter.cn)
 
 ## 背景
   1. 随着社区对支持Swift的需求日益增多，Swift5.0二进制库也具有更好的稳定性和兼容性表现，货拉拉技术团队根据社区反馈及内部讨论，决定开源内部业务使用的Swift版本路由组件，与2023年8月份已发布的Objective-C版本路由组件组成一个完整解决方案。

@@ -1,13 +1,11 @@
 ![](https://therouter.cn/assets/img/logo/logo4.png)
 
-# TheRouter
-
 [![**license**](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![**Platform**](https://img.shields.io/badge/platform-iOS-blue.svg)]()
 [![**Language**](https://img.shields.io/badge/language-Swift-orange.svg)]()
 [![**wiki**](https://img.shields.io/badge/Wiki-open-brightgreen.svg)](https://xxx.com)
 
-> [Chinese Documentation](README.md)
+iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中文官网](https://therouter.cn) | [英文官网](https://en.therouter.cn)
 
 ## Background
 
