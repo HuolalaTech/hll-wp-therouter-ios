@@ -146,6 +146,16 @@ TheRouter.lazyRegisterRouterHandle { url, userInfo in
 TheRouterManager.registerServices(excludeCocoapods: false)
 ```
 
+**注意事项**
+为什么会有TheRouterApi这个类，在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。 Debug下强制校验是为了保证线上没有问题，上线前最后一层保证。
+TheRouterApi 不是注册时使用的，是跨模块调用时使用的，比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是风险的话需要自己评估，跨模块这块你不知道别人会改类名啥的，这个风险是要考虑的。
+
+**注意事项**
+为什么会有TheRouterApi这个类，在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。 Debug下强制校验是为了保证线上没有问题，上线前最后一层保证。
+TheRouterApi 不是注册时使用的，是跨模块调用时使用的，比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是风险的话需要自己评估，跨模块这块你不知道别人会改类名啥的，这个风险是要考虑的。
+
 ### 路由注册
 
 #### 自动化注册
