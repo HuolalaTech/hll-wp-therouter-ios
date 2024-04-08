@@ -135,9 +135,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS&desc=通过TheRouterManager.addGloableRouter()传入registerClassPrifxArray参数，将指定遍历工程中具有特性前缀名的class，降低遍历数量级，减少性能损耗", ["model": model, "clouse": clouse]))
         case 5:
-            
-            let model = TheRouterModel.init(name: "AKyS", age: 18)
-            TheRouter.openURL(("scheme://router/demo2?id=2&value=3&name=AKyS&desc=这是一个OC类的界面，实现路由的跳转需要继承OC类，并实现TheRouterAble协议即可", ["model": model]))
+//            let model = TheRouterModel.init(name: "AKyS", age: 18)
+//            TheRouter.openURL(("scheme://router/demo2?id=2&value=3&name=AKyS&desc=这是一个OC类的界面，实现路由的跳转需要继承OC类，并实现TheRouterAble协议即可", ["model": model]))
+            TheRouter.openURL(TheRouterBApi().requiredURL)
         case 6:
             
             let model = TheRouterModel.init(name: "AKyS", age: 18)

@@ -16,7 +16,6 @@
 		1C839BA02AA6F67A00726596 /* TheRouterControllerA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B922AA6F67A00726596 /* TheRouterControllerA.swift */; };
 		1C839BA12AA6F67A00726596 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1C839B932AA6F67A00726596 /* Main.storyboard */; };
 		1C839BA22AA6F67A00726596 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B942AA6F67A00726596 /* AppDelegate.swift */; };
-		1C839BA32AA6F67A00726596 /* TheRouterControllerB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B962AA6F67A00726596 /* TheRouterControllerB.swift */; };
 		1C839BA42AA6F67A00726596 /* TheRouterBController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B972AA6F67A00726596 /* TheRouterBController.m */; };
 		1C839BA52AA6F67A00726596 /* TheRouterControllerD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B982AA6F67A00726596 /* TheRouterControllerD.swift */; };
 		1C839BA62AA6F67A00726596 /* TheRouterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B992AA6F67A00726596 /* TheRouterController.swift */; };
@@ -54,7 +53,6 @@
 		1C839B932AA6F67A00726596 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		1C839B942AA6F67A00726596 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1C839B952AA6F67A00726596 /* TheRouterBController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TheRouterBController.h; sourceTree = "<group>"; };
-		1C839B962AA6F67A00726596 /* TheRouterControllerB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TheRouterControllerB.swift; sourceTree = "<group>"; };
 		1C839B972AA6F67A00726596 /* TheRouterBController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TheRouterBController.m; sourceTree = "<group>"; };
 		1C839B982AA6F67A00726596 /* TheRouterControllerD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TheRouterControllerD.swift; sourceTree = "<group>"; };
 		1C839B992AA6F67A00726596 /* TheRouterController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TheRouterController.swift; sourceTree = "<group>"; };
@@ -138,7 +136,6 @@
 				1C839B972AA6F67A00726596 /* TheRouterBController.m */,
 				1C839B992AA6F67A00726596 /* TheRouterController.swift */,
 				1C839B922AA6F67A00726596 /* TheRouterControllerA.swift */,
-				1C839B962AA6F67A00726596 /* TheRouterControllerB.swift */,
 				F0750B132B5EA112003FD724 /* LARouterController.swift */,
 				F0750B152B5EA72A003FD724 /* AnyPrifxClassTestController.swift */,
 				1C839B8E2AA6F67A00726596 /* TheRouterControllerC.swift */,
@@ -384,7 +381,6 @@
 				F0750B142B5EA112003FD724 /* LARouterController.swift in Sources */,
 				1C839BA22AA6F67A00726596 /* AppDelegate.swift in Sources */,
 				1C41F0152B0DD793002E2F24 /* TheRouterControllerE.swift in Sources */,
-				1C839BA32AA6F67A00726596 /* TheRouterControllerB.swift in Sources */,
 				1C839BA42AA6F67A00726596 /* TheRouterBController.m in Sources */,
 				1C839B9D2AA6F67A00726596 /* TheRouterApi.swift in Sources */,
 				1C839B9E2AA6F67A00726596 /* TheRouterWebController.swift in Sources */,

@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // - excludeCocoapods: 是否对Cocoapods生成的组件进行动态注册
         // - excludeCocoapods = true 不对Cocoapods生成的组件进行动态注册， false 对Cocoapods生成的组件也进行遍历动态注册
         // - useCache: 是否开启本地缓存功能
-        TheRouterManager.loadRouterClass(excludeCocoapods: true, useCache: true)
+        TheRouterManager.loadRouterClass(excludeCocoapods: true, useCache: false)
         
         TheRouter.lazyRegisterRouterHandle { url, userInfo in
             TheRouterManager.injectRouterServiceConfig(webRouterUrl, serivceHost)

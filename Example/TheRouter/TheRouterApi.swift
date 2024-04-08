@@ -36,17 +36,7 @@ public class TheRouterAApi: NSObject, CustomRouterInfo {
 public class TheRouterBApi: NSObject, CustomRouterInfo {
     
     public static var patternString = "scheme://router/demo2"
-    public static var routerClass = "TheRouter_Example.TheRouterControllerB"
-    public var params: [String: Any] { return [:] }
-    public var jumpType: LAJumpType = .push
-    
-    public override init() {}
-}
-
-public class TheRouterBAndroidApi: NSObject, CustomRouterInfo {
-    
-    public static var patternString = "scheme://router/demo2-Android"
-    public static var routerClass = "TheRouter_Example.TheRouterControllerB"
+    public static var routerClass = "TheRouterBController"
     public var params: [String: Any] { return [:] }
     public var jumpType: LAJumpType = .push
     
