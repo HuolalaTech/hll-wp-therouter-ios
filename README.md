@@ -344,7 +344,7 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
 
 ### 如何让 OC 类也享受到 Swift 路由
 
-这是一个 OC 类的界面，实现路由的跳转需要继承 OC 类，并实现 TheRouterAble 协议即可
+这是一个 OC 类的界面，实现路由的跳转需要实现 TheRouterableProxy 协议即可
 
 ```Swift
 @interface TheRouterBController : UIViewController
@@ -370,7 +370,7 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
 }
 
 + (NSUInteger)priority {
-    return 1;
+    return TheRouterPriorityDefault;
 }
 
 + (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info {
