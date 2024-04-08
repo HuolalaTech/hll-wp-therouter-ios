@@ -20,7 +20,7 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
 * **5. 硬编码消除**：将注册的path转为静态字符串常量供业务使用；
 * **6. 动态化能力**：支持添加重定向，移除重定向、动态添加路由、动态移除路由、拦截器、错误path修复等；
 * **7. 链式编程**：支持链式编程方式拼接URL与参数；
-* **8. 适配Objective-C**：OC类可以在Swift中使用继承的方式遵循协议来进行动态注册；
+* **8. 适配Objective-C**：OC类可以实现TheRouterableProxy 协议即可，底层做了兼容；
 * **9. 服务调用**：支持本地服务调用与远端服务调用；
 * **10. 增加异步获取符合条件注册类**：遍历工程实现路由协议的类，并提前存储；
 * **11. 增加路由本地缓存能力**：每次重启应用，需要重新走注册流程，增加根据版本号进行本地缓存能力，避免初次注册;
@@ -37,7 +37,7 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
 | 7 | 支持路由映射文件导出 | TheRouter.writeRouterMapToFile |
 | 8 | 支持重定向，移除重定向、动态添加路由、动态移除路由，错误path修复 | TheRouter.addRelocationHandle |
 | 9 | 支持拦截器 | TheRouter.addRouterInterceptor |
-| 10 | 支持Swift项目中调用OC路由 | OC类可以在Swift中使用继承的方式遵循协议来进行动态注册 |
+| 10 | 支持Swift项目中调用OC路由 | OC类可以实现TheRouterableProxy 协议即可，底层做了兼容 |
 | 11 | 支持全局失败监控 | TheRouter.globalOpenFailedHandler  |
 | 12 | 支持路由与服务日志回调 | TheRouter.logcat(_ url: String, _ logType: TheRouterLogType, _ errorMsg: String)  |
 | 13 | 支持路由注册期的安全检查 | TheRouterManager.routerForceRecheck()  客户端强制校验，是否匹配,不匹配触发断言|
