@@ -344,14 +344,14 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
 
 ### 如何让 OC 类也享受到 Swift 路由
 
-这是一个 OC 类的界面，实现路由的跳转需要继承 OC 类，并实现 TheRouterAble 协议即可
+这是一个 OC 类的界面，实现路由的跳转需要实现 TheRouterableProxy 协议即可
 
 ```Swift
 @interface TheRouterBController : UIViewController
 @property (nonatomic, strong) UILabel *desLabel;
 @end
 
-@interface TheRouterBController ()
+@interface TheRouterBController ()<TheRouterableProxy>
 
 @end
 
@@ -363,25 +363,22 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
     [self.view addSubview:self.desLabel];
     // Do any additional setup after loading the view.
 }
-@end
 
-public class TheRouterControllerB: TheRouterBController, TheRouterable {
-
-    public static var patternString: [String] {
-        ["scheme://router/demo2",
-         "scheme://router/demo2-Android"]
-    }
-    
-    public static var descriptions: String {
-        "TheRouterControllerDemo"
-    }
-
-    public static func registerAction(info: [String : Any]) -> Any {
-        let vc =  TheRouterBController()
-        vc.desLabel.text = info.description
-        return vc
-    }
+// 实现协议中的类方法
++ (NSArray<NSString *> *)patternString {
+    return @[@"scheme://router/demo2"];
 }
+
++ (NSUInteger)priority {
+    return TheRouterPriorityDefault;
+}
+
++ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info {
+    TheRouterBController *vc = [[TheRouterBController alloc] init];
+    vc.desLabel.text = info.description;
+    return vc;
+}
+@end
 ```
 
 ### 路由根据版本号缓存能力

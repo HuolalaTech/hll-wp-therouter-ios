@@ -190,6 +190,7 @@ extension TheRouterManager {
         
         for i in 0 ..< resultXLClass.count {
             let currentClass: AnyClass = resultXLClass[i]
+         
             if let cls = currentClass as? TheRouterable.Type {
                 let fullName: String = NSStringFromClass(currentClass.self)
                 if fullName.contains(kSADelegateClassSensorsSuffix)  {
@@ -197,13 +198,27 @@ extension TheRouterManager {
                 }
                 
                 for s in 0 ..< cls.patternString.count {
-                    
                     if fullName.contains(NSKVONotifyingPrefix) {
                         let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
                         let subString = fullName[range]
                         registerRouterList.append([TheRouterPath: cls.patternString[s], TheRouterClassName: "\(subString)", TheRouterPriority: "\(cls.priority)"])
                     } else {
                         registerRouterList.append([TheRouterPath: cls.patternString[s], TheRouterClassName: fullName, TheRouterPriority: "\(cls.priority)"])
+                    }
+                }
+            } else if currentClass.self.conforms(to: TheRouterableProxy.self) {
+                let fullName: String = NSStringFromClass(currentClass.self)
+                if fullName.contains(kSADelegateClassSensorsSuffix)  {
+                    break
+                }
+                
+                for s in 0 ..< currentClass.patternString().count {
+                    if fullName.contains(NSKVONotifyingPrefix) {
+                        let range = fullName.index(fullName.startIndex, offsetBy: NSKVONotifyingPrefix.count)..<fullName.endIndex
+                        let subString = fullName[range]
+                        registerRouterList.append([TheRouterPath: currentClass.patternString()[s], TheRouterClassName: "\(subString)", TheRouterPriority: "\(String(describing: currentClass.priority()))"])
+                    } else {
+                        registerRouterList.append([TheRouterPath: currentClass.patternString()[s], TheRouterClassName: fullName, TheRouterPriority: "\(String(describing: currentClass.priority()))"])
                     }
                 }
             }
