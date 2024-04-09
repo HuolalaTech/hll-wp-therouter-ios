@@ -101,7 +101,7 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
 Add the following entry in your Podfile:
 
 ```ruby
-   pod 'TheRouter', '1.1.5'
+   pod 'TheRouter', '1.1.6'
 ```
 
 ## Swift限制版本
