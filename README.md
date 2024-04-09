@@ -95,6 +95,10 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
 
 <img src="assets/ScreenRecording.gif">
 
+## 使用讲解视频
+ 
+TheRouteriOS讲解视频：<https://www.bilibili.com/video/BV1px4y1Y7mX>
+
 ## 如何集成使用
 
 ### [CocoaPods](https://cocoapods.org)
@@ -238,6 +242,8 @@ TheRouter.openURL(TheRouterApi.init().requiredURL)
 TheRouter.openURL(TheRouterAApi.init().requiredURL)
 ```
 
+**底层自动注册，涉及到NSClassFromString，在Swift中的使用方式与OC是有区别，并不像OC可以直接往NSClassFromString()放入字符串类型的类名即可，Swift这样是找不到的。
+swift中由于命名空间的存在，如果还用上面的方法通过字符串动态的创建类是不可以的（得到的会是空）。swift通过字符串动态的创建类我们需要在字符串的前面加上命名空间. **
 
 #### 打开路由方式二 - scheme+paths+params
 
@@ -380,6 +386,7 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
 }
 @end
 ```
+
 
 ### 路由根据版本号缓存能力
 
