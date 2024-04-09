@@ -43,6 +43,27 @@ public class TheRouterBApi: NSObject, CustomRouterInfo {
     public override init() {}
 }
 
+public class TheRouterBaseAApi: NSObject, CustomRouterInfo {
+    
+    public static var patternString = "scheme://router/baseA"
+    public static var routerClass = "TheRouterBaseAViewController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+    
+    public override init() {}
+}
+
+public class TheRouterBaseBApi: NSObject, CustomRouterInfo {
+    
+    public static var patternString = "scheme://router/baseB"
+    public static var routerClass = "TheRouterBaseBViewController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .push
+    
+    public override init() {}
+}
+
+
 public class TheRouterCApi: NSObject, CustomRouterInfo {
     
     public static var patternString = "scheme://router/demo33"

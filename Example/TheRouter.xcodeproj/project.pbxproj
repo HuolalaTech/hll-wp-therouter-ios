@@ -27,6 +27,9 @@
 		B4C21EFE5B0ABE82F3498107 /* Pods_TheRouter_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD1C616AE5833A562B960C6C /* Pods_TheRouter_Example.framework */; };
 		F0750B142B5EA112003FD724 /* LARouterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0750B132B5EA112003FD724 /* LARouterController.swift */; };
 		F0750B162B5EA72A003FD724 /* AnyPrifxClassTestController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0750B152B5EA72A003FD724 /* AnyPrifxClassTestController.swift */; };
+		F0DB7D932BC5706200A59313 /* TheRouterBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0DB7D922BC5706200A59313 /* TheRouterBaseViewController.m */; };
+		F0DB7D9C2BC5710300A59313 /* TheRouterBaseAViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0DB7D9B2BC5710300A59313 /* TheRouterBaseAViewController.m */; };
+		F0DB7D9F2BC5710B00A59313 /* TheRouterBaseBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0DB7D9E2BC5710B00A59313 /* TheRouterBaseBViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +75,12 @@
 		DD1C616AE5833A562B960C6C /* Pods_TheRouter_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheRouter_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0750B132B5EA112003FD724 /* LARouterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LARouterController.swift; sourceTree = "<group>"; };
 		F0750B152B5EA72A003FD724 /* AnyPrifxClassTestController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyPrifxClassTestController.swift; sourceTree = "<group>"; };
+		F0DB7D912BC5706200A59313 /* TheRouterBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TheRouterBaseViewController.h; sourceTree = "<group>"; };
+		F0DB7D922BC5706200A59313 /* TheRouterBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TheRouterBaseViewController.m; sourceTree = "<group>"; };
+		F0DB7D9A2BC5710300A59313 /* TheRouterBaseAViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TheRouterBaseAViewController.h; sourceTree = "<group>"; };
+		F0DB7D9B2BC5710300A59313 /* TheRouterBaseAViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TheRouterBaseAViewController.m; sourceTree = "<group>"; };
+		F0DB7D9D2BC5710B00A59313 /* TheRouterBaseBViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TheRouterBaseBViewController.h; sourceTree = "<group>"; };
+		F0DB7D9E2BC5710B00A59313 /* TheRouterBaseBViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TheRouterBaseBViewController.m; sourceTree = "<group>"; };
 		FF1C0100BC70EE123DBECCBE /* Pods-TheRouter_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheRouter_Tests.release.xcconfig"; path = "Target Support Files/Pods-TheRouter_Tests/Pods-TheRouter_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -134,7 +143,13 @@
 				1C839B8F2AA6F67A00726596 /* TheRouterApi.swift */,
 				1C839B952AA6F67A00726596 /* TheRouterBController.h */,
 				1C839B972AA6F67A00726596 /* TheRouterBController.m */,
+				F0DB7D912BC5706200A59313 /* TheRouterBaseViewController.h */,
+				F0DB7D922BC5706200A59313 /* TheRouterBaseViewController.m */,
 				1C839B992AA6F67A00726596 /* TheRouterController.swift */,
+				F0DB7D9A2BC5710300A59313 /* TheRouterBaseAViewController.h */,
+				F0DB7D9B2BC5710300A59313 /* TheRouterBaseAViewController.m */,
+				F0DB7D9D2BC5710B00A59313 /* TheRouterBaseBViewController.h */,
+				F0DB7D9E2BC5710B00A59313 /* TheRouterBaseBViewController.m */,
 				1C839B922AA6F67A00726596 /* TheRouterControllerA.swift */,
 				F0750B132B5EA112003FD724 /* LARouterController.swift */,
 				F0750B152B5EA72A003FD724 /* AnyPrifxClassTestController.swift */,
@@ -375,11 +390,14 @@
 				1C839BA62AA6F67A00726596 /* TheRouterController.swift in Sources */,
 				1C839B9C2AA6F67A00726596 /* TheRouterControllerC.swift in Sources */,
 				1C839BA02AA6F67A00726596 /* TheRouterControllerA.swift in Sources */,
+				F0DB7D932BC5706200A59313 /* TheRouterBaseViewController.m in Sources */,
+				F0DB7D9C2BC5710300A59313 /* TheRouterBaseAViewController.m in Sources */,
 				F0750B162B5EA72A003FD724 /* AnyPrifxClassTestController.swift in Sources */,
 				1C839BA72AA6F67A00726596 /* AppConfigServices.swift in Sources */,
 				1C839B9B2AA6F67A00726596 /* TheRouterModel.swift in Sources */,
 				F0750B142B5EA112003FD724 /* LARouterController.swift in Sources */,
 				1C839BA22AA6F67A00726596 /* AppDelegate.swift in Sources */,
+				F0DB7D9F2BC5710B00A59313 /* TheRouterBaseBViewController.m in Sources */,
 				1C41F0152B0DD793002E2F24 /* TheRouterControllerE.swift in Sources */,
 				1C839BA42AA6F67A00726596 /* TheRouterBController.m in Sources */,
 				1C839B9D2AA6F67A00726596 /* TheRouterApi.swift in Sources */,
