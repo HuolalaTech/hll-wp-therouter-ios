@@ -27,7 +27,7 @@ In addition, it supports finding corresponding modules through Service-Protocol,
 * **5. Hard-coded elimination:**  Converts the registered path to a static string constant for business use;
 * **6. Dynamic capability:**  Support to add emphasis direction, remove redirection, dynamic add route, dynamic remove route, interceptor, error path repair, etc.
 * **7. Chain programming:**  Support chain programming to concatenate urls and parameters;
-* **8. Adaptation Objective-C** : OC classes can dynamically register in Swift using inheritance to follow the protocol.
+* **8. Adaptation Objective-C** : The OC class can implement the TheRouterableProxy protocol, and the underlying layer is compatible with it.
 * **9. Service call:**  Support local service call and remote service call;
 * **10. Added asynchronous acquisition of eligible registration classes**: Find classes that implement routing protocols in projects and store them in advance;
 * **11. Added routing local server capability**: Every time you restart the application, you need to go through the registration process again. Added local server capability based on version number to avoid initial registration;
@@ -43,7 +43,7 @@ In addition, it supports finding corresponding modules through Service-Protocol,
 | 7 | Support for exporting routing mapping files | TheRouter.writeRouterMapToFile |
 | 8 | Support redirection, remove redirection, dynamically add routes, dynamically remove routes, and fix error paths | TheRouter.addRelocationHandle |
 | 9 | Support interceptors | TheRouter.addRouterInterceptor |
-| 10 | Support calling OC route in Swift project | OC classes can be dynamically registered in Swift using inheritance to follow protocols|
+| 10 | Support calling OC route in Swift project | The OC class can implement the TheRouterableProxy protocol, and the underlying layer is compatible with it|
 | 11 | Support for global failure monitoring | TheRouter.globalOpenFailedHandler  |
 | 12 | Support for routing and service log callback | TheRouter.logcat(_ url: String, _ logType: TheRouterLogType, _ errorMsg: String)  |
 | 13 | Support security checks during route registration period | TheRouterManager.routerForceRecheck()  Client mandatory verification, whether it matches, triggering assertion if it does not match |
@@ -108,7 +108,7 @@ In order to keep consistent with the Android side, the URL and class registratio
 Add the following entry in your Podfile:
 
 ```ruby
-   pod 'TheRouter', '1.1.5'
+   pod 'TheRouter', '1.1.6'
 ```
 
 ## Swift Restricted version
@@ -172,6 +172,16 @@ TheRouter.lazyRegisterRouterHandle { url, userInfo in
 // 动态注册服务
 TheRouterManager.registerServices(excludeCocoapods: false)
 ```
+
+**Precautions**
+Why is there a class called TheRouterApi? When making cross module calls, we cannot obtain specific class information from other modules, so the abstract TheRouterApi can implement cross module calls. The mandatory verification under Debug is to ensure that there are no issues online, and the last layer of assurance before going online.
+TheRouterApi is not used during registration, but rather during cross module calls, such as' TheRouter. openURL (TheRouterLAApi(). equiredURL) ', which automatically registers routes by implementing the TheRouterAble protocol.
+ForceCheckEnable forces the opening of the convenient class defined by TheRouterApi to be the same as the implementation of the TheRouterAble protocol class. If opened, the debugging environment will automatically detect and avoid online problems. It is recommended to turn it on. There are switches here, but if you think it is unnecessary, change them to false. However, if there is a risk, you need to evaluate it yourself. In terms of cross module, you may not know what others will change the class name, and this risk should be considered.
+
+**Precautions**
+Why is there a class called TheRouterApi? When making cross module calls, we cannot obtain specific class information from other modules, so the abstract TheRouterApi can implement cross module calls. The mandatory verification under Debug is to ensure that there are no issues online, and the last layer of assurance before going online.
+TheRouterApi is not used during registration, but rather during cross module calls, such as' TheRouter. openURL (TheRouterLAApi(). equiredURL) ', which automatically registers routes by implementing the TheRouterAble protocol.
+ForceCheckEnable forces the opening of the convenient class defined by TheRouterApi to be the same as the implementation of the TheRouterAble protocol class. If opened, the debugging environment will automatically detect and avoid online problems. It is recommended to turn it on. There are switches here, but if you think it is unnecessary, change them to false. However, if there is a risk, you need to evaluate it yourself. In terms of cross module, you may not know what others will change the class name, and this risk should be considered.
 
  #### OC The form of the annotation
  Here is a list of the ways OC uses annotations, which Swift does not support due to its lack of dynamism.
@@ -255,14 +265,14 @@ public class func openCacheRouter(_ uriTuple: (String, [String: Any])) -> Any? {
 }
 ```
 #### How can OC classes also enjoy Swift routes
-This is an OC class interface, the implementation of the route jump needs to inherit OC class, and implement the TheRouterAble protocol
+This is an OC class interface, and implementing the RouterableProxy protocol is sufficient for routing redirection.
 
 ```Swift
 @interface TheRouterBController : UIViewController
 @property (nonatomic, strong) UILabel *desLabel;
 @end
 
-@interface TheRouterBController ()
+@interface TheRouterBController ()<TheRouterableProxy>
 
 @end
 
@@ -274,21 +284,22 @@ This is an OC class interface, the implementation of the route jump needs to inh
     [self.view addSubview:self.desLabel];
     // Do any additional setup after loading the view.
 }
-@end
 
-public class TheRouterControllerB: TheRouterBController, TheRouterable {
-
-    public static var patternString: [String] {
-        ["scheme://router/demo2",
-         "scheme://router/demo2-Android"]
-    }
-
-    public static func registerAction(info: [String : Any]) -> Any {
-        let vc =  TheRouterBController()
-        vc.desLabel.text = info.description
-        return vc
-    }
+// 实现协议中的类方法
++ (NSArray<NSString *> *)patternString {
+    return @[@"scheme://router/demo2"];
 }
+
++ (NSUInteger)priority {
+    return TheRouterPriorityDefault;
+}
+
++ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info {
+    TheRouterBController *vc = [[TheRouterBController alloc] init];
+    vc.desLabel.text = info.description;
+    return vc;
+}
+@end
 ```
 
 
