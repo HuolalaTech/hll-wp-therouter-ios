@@ -33,11 +33,14 @@ public class TheRouterManager: NSObject {
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
     ///   - urlPath: 将要打开的路由path
     ///   - userInfo: 路由传递的参数
-    ///   - forceCheckEnable: 是否支持强制校验，强制校验要求Api声明与对应的类必须实现TheRouterAble协议
+    ///   - forceCheckType: 强制校验类型
+    ///   注意: 传入nil或者不传不进行校验，
+    ///   传入.runtime类型强制校验要求Api声明与对应的类必须实现TheRouterAble协议,
+    ///   传入.staticWithRoutingList类型强制校验要求要求传入的路由表数字的元素遵守StaticRouterInfoConvertible协议
     public static func addGloableRouter(_ excludeCocoapods: Bool = false,
                                         _ urlPath: String,
                                         _ userInfo: [String: Any],
-                                        forceCheckEnable: Bool = false) -> Any? {
+                                        forceCheckType: TheRouterForceCheckType? = nil) -> Any? {
         
         TheRouter.globalOpenFailedHandler { (info) in
             guard let matchFailedKey = info[TheRouter.matchFailedKey] as? String else { return }
@@ -45,7 +48,7 @@ public class TheRouterManager: NSObject {
             TheRouter.shareInstance.logcat?("TheRouter: globalOpenFailedHandler", .logError, "\(matchFailedKey)")
         }
         
-        return TheRouterManager.registerRouterMap(excludeCocoapods, urlPath, userInfo, forceCheckEnable: forceCheckEnable)
+        return TheRouterManager.registerRouterMap(excludeCocoapods, urlPath, userInfo, forceCheckType: forceCheckType)
     }
     
     // MARK: -注册web与服务调用
@@ -72,7 +75,7 @@ extension TheRouterManager {
     public class func registerRouterMap(_ excludeCocoapods: Bool = false,
                                         _ urlPath: String,
                                         _ userInfo: [String: Any],
-                                        forceCheckEnable: Bool = false) -> Any? {
+                                        forceCheckType: TheRouterForceCheckType? = nil) -> Any? {
         
         let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         
@@ -93,9 +96,9 @@ extension TheRouterManager {
         } else {
             TheRouter.shareInstance.logcat?("未使用缓存注册路由耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
         }
-        if forceCheckEnable {
+        if let forceCheckType {
 #if DEBUG
-           routerForceRecheck(excludeCocoapods)
+           routerForceRecheck(excludeCocoapods, forceCheckType: forceCheckType)
 #endif
         }
 
@@ -233,46 +236,54 @@ extension TheRouterManager {
     /// - Parameters:
     ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
     ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
-    class func runtimeRouterList(_ excludeCocoapods: Bool = false) {
+    class func runtimeRouterList(_ excludeCocoapods: Bool = false, forceCheckType: TheRouterForceCheckType) {
         
-        let bundles = CFBundleGetAllBundles() as? [CFBundle]
-        for bundle in bundles ?? [] {
-            let identifier = CFBundleGetIdentifier(bundle);
-            
-            if let id = identifier as? String {
-                if excludeCocoapods {
-                    if  id.hasPrefix(kSAppleSuffix) || id.hasPrefix(kSCocoaPodsSuffix) {
-                        continue
-                    }
-                } else {
-                    if  id.hasPrefix(kSAppleSuffix) {
-                        continue
+        switch forceCheckType {
+        case .runtime:
+            let bundles = CFBundleGetAllBundles() as? [CFBundle]
+            for bundle in bundles ?? [] {
+                let identifier = CFBundleGetIdentifier(bundle);
+                
+                if let id = identifier as? String {
+                    if excludeCocoapods {
+                        if  id.hasPrefix(kSAppleSuffix) || id.hasPrefix(kSCocoaPodsSuffix) {
+                            continue
+                        }
+                    } else {
+                        if  id.hasPrefix(kSAppleSuffix) {
+                            continue
+                        }
                     }
                 }
-            }
-            
-            guard let execURL = CFBundleCopyExecutableURL(bundle) as NSURL? else { continue }
-            let imageURL = execURL.fileSystemRepresentation
-            let classCount = UnsafeMutablePointer<UInt32>.allocate(capacity: MemoryLayout<UInt32>.stride)
-            guard let classNames = objc_copyClassNamesForImage(imageURL, classCount) else {
-                continue
-            }
-            
-            for idx in 0..<classCount.pointee {
-                let currentClassName = String(cString: classNames[Int(idx)])
-                guard let currentClass = NSClassFromString(currentClassName) else {
+                
+                guard let execURL = CFBundleCopyExecutableURL(bundle) as NSURL? else { continue }
+                let imageURL = execURL.fileSystemRepresentation
+                let classCount = UnsafeMutablePointer<UInt32>.allocate(capacity: MemoryLayout<UInt32>.stride)
+                guard let classNames = objc_copyClassNamesForImage(imageURL, classCount) else {
                     continue
                 }
                 
-                if class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil,
-                   class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil  {
-                    if let clss = currentClass as? CustomRouterInfo.Type {
-                        apiArray.append(clss.patternString)
-                        classMapArray.append(clss.routerClass)
+                for idx in 0..<classCount.pointee {
+                    let currentClassName = String(cString: classNames[Int(idx)])
+                    guard let currentClass = NSClassFromString(currentClassName) else {
+                        continue
+                    }
+                    
+                    if class_getInstanceMethod(currentClass, NSSelectorFromString("methodSignatureForSelector:")) != nil,
+                       class_getInstanceMethod(currentClass, NSSelectorFromString("doesNotRecognizeSelector:")) != nil  {
+                        if let clss = currentClass as? CustomRouterInfo.Type {
+                            apiArray.append(clss.patternString)
+                            classMapArray.append(clss.routerClass)
+                        }
                     }
                 }
             }
+        case .staticWithRoutingList(let array):
+            apiArray.append(contentsOf: array.map { $0.patternString })
+            classMapArray.append(contentsOf: array.map { $0.routerClass })
         }
+        
+        
     }
     
     // MARK: - 自动注册服务
@@ -377,8 +388,8 @@ extension TheRouterManager {
     }
     
     // MARK: - 客户端强制校验，是否匹配
-    public static func routerForceRecheck(_ excludeCocoapods: Bool = false) {
-        TheRouterManager.runtimeRouterList(excludeCocoapods)
+    public static func routerForceRecheck(_ excludeCocoapods: Bool = false, forceCheckType: TheRouterForceCheckType) {
+        TheRouterManager.runtimeRouterList(excludeCocoapods, forceCheckType: forceCheckType)
         let paths = registerRouterList.compactMap { $0[TheRouterPath] }
         let patternArray = Set(paths)
         let apiPathArray = Set(apiArray)

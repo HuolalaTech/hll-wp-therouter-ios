@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00D07D3B2BC663D0001E01D5 /* TheRouterStaticTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D07D3A2BC663D0001E01D5 /* TheRouterStaticTable.swift */; };
 		1C41F0152B0DD793002E2F24 /* TheRouterControllerE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C41F0142B0DD792002E2F24 /* TheRouterControllerE.swift */; };
 		1C839B9B2AA6F67A00726596 /* TheRouterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B8D2AA6F67A00726596 /* TheRouterModel.swift */; };
 		1C839B9C2AA6F67A00726596 /* TheRouterControllerC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C839B8E2AA6F67A00726596 /* TheRouterControllerC.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00D07D3A2BC663D0001E01D5 /* TheRouterStaticTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TheRouterStaticTable.swift; sourceTree = "<group>"; };
 		09546D12C361FE0E5F02A56B /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		12FA9F3BF6BBEE9E04423D1E /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		1C41F0142B0DD792002E2F24 /* TheRouterControllerE.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TheRouterControllerE.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				1C839B942AA6F67A00726596 /* AppDelegate.swift */,
 				1C839B932AA6F67A00726596 /* Main.storyboard */,
 				1C839B8F2AA6F67A00726596 /* TheRouterApi.swift */,
+				00D07D3A2BC663D0001E01D5 /* TheRouterStaticTable.swift */,
 				1C839B952AA6F67A00726596 /* TheRouterBController.h */,
 				1C839B972AA6F67A00726596 /* TheRouterBController.m */,
 				F0DB7D912BC5706200A59313 /* TheRouterBaseViewController.h */,
@@ -388,6 +391,7 @@
 				1C839B9F2AA6F67A00726596 /* ViewController.swift in Sources */,
 				1C839BA52AA6F67A00726596 /* TheRouterControllerD.swift in Sources */,
 				1C839BA62AA6F67A00726596 /* TheRouterController.swift in Sources */,
+				00D07D3B2BC663D0001E01D5 /* TheRouterStaticTable.swift in Sources */,
 				1C839B9C2AA6F67A00726596 /* TheRouterControllerC.swift in Sources */,
 				1C839BA02AA6F67A00726596 /* TheRouterControllerA.swift in Sources */,
 				F0DB7D932BC5706200A59313 /* TheRouterBaseViewController.m in Sources */,

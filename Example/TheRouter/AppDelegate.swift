@@ -40,9 +40,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
             ///   - urlPath: 将要打开的路由path
             ///   - userInfo: 路由传递的参数
-            ///   - forceCheckEnable: 是否支持强制校验，强制校验要求Api声明与对应的类必须实现TheRouterAble协议
-            ///   - forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开
-            return TheRouterManager.addGloableRouter(true, url, userInfo, forceCheckEnable: true)
+            ///   - forceCheckType: 强制校验类型
+            ///   注意: 传入nil或者不传不进行校验，
+            ///   传入.runtime类型强制校验要求Api声明与对应的类必须实现TheRouterAble协议,
+            ///   传入.staticWithRoutingList类型强制校验要求要求传入的路由表数字的元素遵守StaticRouterInfoConvertible协议
+            ///   打开的话，debug环境会自动检测，避免线上出问题，建议打开
+            
+            /// runtime校验
+            //return TheRouterManager.addGloableRouter(true, url, userInfo, forceCheckType: .runtime)
+            
+            /// 静态路由表校验
+            let routingList = AppStaticRouteTable.all + TestModuleRouteTable.all
+            return TheRouterManager.addGloableRouter(true, url, userInfo, forceCheckType: .staticWithRoutingList(routingList))
         }
             
         // 动态注册服务
