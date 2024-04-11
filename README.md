@@ -99,6 +99,27 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
  
 TheRouteriOS讲解视频：<https://www.bilibili.com/video/BV1px4y1Y7mX>
 
+##注意事项
+
+###1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
+   在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。这里增加这个类仅仅作为辅助打开路由工具类而已。如果你不用也是OK的，可以直接通过 `TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")`打开路由即可。 
+###2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+###3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
+
+
+##注意事项
+###1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
+   在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。这里增加这个类仅仅作为辅助打开路由工具类而已。如果你不用也是OK的，可以直接通过 `TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")`打开路由即可。 
+###2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+###3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
+
+
+##注意事项
+###1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
+   在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。这里增加这个类仅仅作为辅助打开路由工具类而已。如果你不用也是OK的，可以直接通过 `TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")`打开路由即可。 
+###2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+###3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
+
 ## 如何集成使用
 
 ### [CocoaPods](https://cocoapods.org)
@@ -149,16 +170,6 @@ TheRouter.lazyRegisterRouterHandle { url, userInfo in
 // 动态注册服务
 TheRouterManager.registerServices(excludeCocoapods: false)
 ```
-
-**注意事项**
-为什么会有TheRouterApi这个类，在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。 Debug下强制校验是为了保证线上没有问题，上线前最后一层保证。
-TheRouterApi 不是注册时使用的，是跨模块调用时使用的，比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
-forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是风险的话需要自己评估，跨模块这块你不知道别人会改类名啥的，这个风险是要考虑的。
-
-**注意事项**
-为什么会有TheRouterApi这个类，在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。 Debug下强制校验是为了保证线上没有问题，上线前最后一层保证。
-TheRouterApi 不是注册时使用的，是跨模块调用时使用的，比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
-forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是风险的话需要自己评估，跨模块这块你不知道别人会改类名啥的，这个风险是要考虑的。
 
 ### 路由注册
 
@@ -242,8 +253,8 @@ TheRouter.openURL(TheRouterApi.init().requiredURL)
 TheRouter.openURL(TheRouterAApi.init().requiredURL)
 ```
 
-**底层自动注册，涉及到NSClassFromString，在Swift中的使用方式与OC是有区别，并不像OC可以直接往NSClassFromString()放入字符串类型的类名即可，Swift这样是找不到的。
-swift中由于命名空间的存在，如果还用上面的方法通过字符串动态的创建类是不可以的（得到的会是空）。swift通过字符串动态的创建类我们需要在字符串的前面加上命名空间. **
+底层自动注册，涉及到NSClassFromString，在Swift中的使用方式与OC是有区别，并不像OC可以直接往NSClassFromString()放入字符串类型的类名即可，Swift这样是找不到的。
+swift中由于命名空间的存在，如果还用上面的方法通过字符串动态的创建类是不可以的（得到的会是空）。swift通过字符串动态的创建类我们需要在字符串的前面加上命名空间. 
 
 #### 打开路由方式二 - scheme+paths+params
 
