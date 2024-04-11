@@ -99,26 +99,26 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
  
 TheRouteriOS讲解视频：<https://www.bilibili.com/video/BV1px4y1Y7mX>
 
-##注意事项
+## 注意事项
 
-###1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
+### 1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
    在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。这里增加这个类仅仅作为辅助打开路由工具类而已。如果你不用也是OK的，可以直接通过 `TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")`打开路由即可。 
-###2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
-###3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
+### 2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+### 3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
 
 
-##注意事项
-###1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
+## 注意事项
+### 1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
    在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。这里增加这个类仅仅作为辅助打开路由工具类而已。如果你不用也是OK的，可以直接通过 `TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")`打开路由即可。 
-###2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
-###3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
+### 2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+### 3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
 
 
-##注意事项
-###1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
+## 注意事项
+### 1. 为什么会有Demo中有TheRouterApi这个类，TheRouterApi中的类是必须写的嘛。
    在跨模块调用时，我们无法拿到其他模块具体的类信息，那么抽象的TheRouterApi就能实现跨模块调用了。这里增加这个类仅仅作为辅助打开路由工具类而已。如果你不用也是OK的，可以直接通过 `TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")`打开路由即可。 
-###2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
-###3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
+### 2. TheRouterApi不是注册时使用的，是跨模块调用时使用的。比如 `TheRouter.openURL(TheRouterLAApi().requiredURL)` 路由注册自动注册的，只需要实现TheRouterAble协议即可。
+### 3. forceCheckEnable具体含义 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开.这里都有开关，如果你觉得没必要，改为false即可，但是需要你自己讲所有跳转的地方都自己测试一遍，看看有没有失败的，当然失败在debug下会触发断言的。
 
 ## 如何集成使用
 
