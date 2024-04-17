@@ -27,6 +27,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSLog("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
         }
         
+        // 类似RDVTabBarControlle也没有继承UITabbarController，导航栈也不同，那么就需要自己实现各种跳转逻辑
+//        TheRouter.customJumpAction { jumpType, instance in
+//          
+//        }
+        
         // 路由懒加载注册,
         // - excludeCocoapods: 是否对Cocoapods生成的组件进行动态注册
         // - excludeCocoapods = true 不对Cocoapods生成的组件进行动态注册， false 对Cocoapods生成的组件也进行遍历动态注册

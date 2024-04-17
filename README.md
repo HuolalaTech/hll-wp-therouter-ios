@@ -24,6 +24,8 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
 * **9. 服务调用**：支持本地服务调用与远端服务调用；
 * **10. 增加异步获取符合条件注册类**：遍历工程实现路由协议的类，并提前存储；
 * **11. 增加路由本地缓存能力**：每次重启应用，需要重新走注册流程，增加根据版本号进行本地缓存能力，避免初次注册;
+* **12. 自定义跳转逻辑实现**：解决类似RDVTabBarControlle也没有继承UITabbarController，导航栈也不同，那么就需要自己实现各种跳转逻辑;
+
 
 
 | 功能序号 | 功能描述 | 事例代码及注释 |
@@ -158,6 +160,11 @@ Add the following entry in your Podfile:
 TheRouter.logcat { url, logType, errorMsg in
     debugPrint("TheRouter: logMsg- \(url) \(logType.rawValue) \(errorMsg)")
 }
+
+//类似RDVTabBarControlle也没有继承UITabbarController，导航栈也不同，那么就需要自己实现各种跳转逻辑
+// TheRouter.customJumpAction { jumpType, instance in
+  
+// }
 
 // 路由懒加载注册,
 // - excludeCocoapods: 是否对Cocoapods生成的组件进行动态注册

@@ -16,6 +16,9 @@ public class TheRouter: TheRouterParser {
     public typealias LazyRegisterHandleBlock = (_ url: String, _ userInfo: [String: Any]) -> Any?
     public typealias RouterLogHandleBlock = (_ url: String, _ logType: TheRouterLogType, _ errorMsg: String) -> Void
     
+    // MARK: - 自定义跳转
+    public typealias CustomJumpActionClouse = (LAJumpType, UIViewController) -> Void
+    
     // MARK: - Private property
     private var interceptors = [TheRouterInterceptor]()
     
@@ -40,6 +43,8 @@ public class TheRouter: TheRouterParser {
     public var serviceHost: String = "scheme://services?"
     
     public var logcat: RouterLogHandleBlock?
+    
+    public var customJumpAction: CustomJumpActionClouse?
     
     // MARK: - Public method
     func addRouterItem(_ patternString: String,
@@ -69,6 +74,10 @@ public class TheRouter: TheRouterParser {
     
     func logcat(_ handle: @escaping RouterLogHandleBlock) {
         logcat = handle
+    }
+    
+    func customJumpAction(_ handle: @escaping CustomJumpActionClouse) {
+        customJumpAction = handle
     }
     
     func removeRouter(_ patternString: String) {
