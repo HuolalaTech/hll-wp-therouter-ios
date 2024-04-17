@@ -79,6 +79,11 @@ public extension TheRouter {
         shareInstance.logcat(handle)
     }
     
+    /// addRouterItemLogHandle
+    class func customJumpAction(_ handle: @escaping CustomJumpActionClouse) {
+        shareInstance.customJumpAction(handle)
+    }
+    
     /// removeRouter by register urlstring
     ///
     /// - Parameter patternString: register urlstring
