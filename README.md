@@ -692,5 +692,7 @@ extension TheRouterController: TheRouterable {
 TheRouter 采用Apache2.0协议，详情参考[LICENSE](LICENSE)
 
 ## 交流沟通群
+ 鉴于群二维码一周就过期，直接添加个人微信，备注来意直接拉群里。
+<img src="assets/IMG_7130.JPG">
 
 <img src="assets/chat_group.JPG">
