@@ -56,16 +56,4 @@ extension TheRouterControllerE4: TheRouterable {
         ["scheme://router/demoE4"]
     }
     
-    static func registerAction(info: [String : Any]) -> Any {
-        
-        let vc =  TheRouterControllerE4()
-        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
-        vc.resultLabel.text = info.description
-        return vc
-    }
-    
-    static var priority: UInt {
-        TheRouterDefaultPriority
-    }
-    
 }

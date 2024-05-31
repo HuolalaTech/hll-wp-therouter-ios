@@ -23,6 +23,9 @@ public let TheRouterPath = "path"
 public let TheRouterClassName = "class"
 //路由priority常量Key
 public let TheRouterPriority = "priority"
+// tabBar选中参数 tabBarSelecIndex
+public let TheRouterTabBarSelecIndex = "tabBarSelecIndex"
+
 
 //路由优先级默认值
 public let TheRouterDefaultPriority: UInt = 1000
@@ -45,6 +48,7 @@ public extension TheRouter {
     case popToTaget
     case windowNavRoot
     case modalDismissBeforePush
+    case showTab
 }
 
 public struct RouteItem {

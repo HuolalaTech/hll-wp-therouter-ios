@@ -18,8 +18,6 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor yellowColor];
     NSLog(@"---> params = %@", self.params);
-
-    // Do any additional setup after loading the view.
 }
 
 // 实现协议中的类方法
@@ -29,12 +27,6 @@
 
 + (NSUInteger)priority {
     return TheRouterPriorityDefault;
-}
-
-+ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info {
-    TheRouterBaseViewController *vc = self.class.new;
-    vc.params = info;
-    return vc;
 }
 
 @end

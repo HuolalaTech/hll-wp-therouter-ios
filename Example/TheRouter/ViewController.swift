@@ -33,7 +33,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                          "传递model模型跳转",
                                          "打开web界面",
                                          "打开路由回调方式",
-                                         "组件打开方式"],
+                                         "组件打开方式",
+                                         "tabbar跳转"],
                                         ["路由重定向能力",
                                          "重定向移除",
                                          "路由解决本地path编写错误",
@@ -125,14 +126,29 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             TheRouter.addRouterItem(TheRouterAApi.patternString, classString: TheRouterAApi.routerClass)
             TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController",
                                      "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
-            TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册字典形式，动态注册TheRouterManager.addGloableRouter，懒加载动态注册 TheRouter.lazyRegisterRouterHandle ")
+            let clouse = { (qrResult: String, qrStatus: Bool) in
+                print("\(qrResult) \(qrStatus)")
+                self.view.makeToast("\(qrResult) \(qrStatus)")
+            }
+            let wrapper = ClosureWrapper1(closure: clouse)
+            TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册字典形式，动态注册TheRouterManager.addGloableRouter，懒加载动态注册 TheRouter.lazyRegisterRouterHandle ",["qrResultCallBack": wrapper]))
             
         case 2:
-            TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=动态注册使用runtime遍历工程类，将路由path与对应的class映射进行存储，进行跳转时，映射解析跳转详情查看Function: TheRouterManager.addGloableRouter")
+            let clouse = { (qrResult: String, qrStatus: Bool) in
+                print("\(qrResult) \(qrStatus)")
+                self.view.makeToast("\(qrResult) \(qrStatus)")
+            }
+            let wrapper = ClosureWrapper1(closure: clouse)
+            TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=动态注册使用runtime遍历工程类，将路由path与对应的class映射进行存储，进行跳转时，映射解析跳转详情查看Function: TheRouterManager.addGloableRouter",["qrResultCallBack": wrapper]))
         case 3:
-            TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=懒加载的动态注册是在动态注册的基础上，为了解决App初始化就遍历解析的性能问题，只有当用户第一次使用路由打开界面或服务时，才进行动态注册并打开路由,详情查看Function: TheRouterManager.lazyRegisterRouterHandle Clouse回调")
+            let clouse = { (qrResult: String, qrStatus: Bool) in
+                print("\(qrResult) \(qrStatus)")
+                self.view.makeToast("\(qrResult) \(qrStatus)")
+            }
+            let wrapper = ClosureWrapper1(closure: clouse)
+            TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=懒加载的动态注册是在动态注册的基础上，为了解决App初始化就遍历解析的性能问题，只有当用户第一次使用路由打开界面或服务时，才进行动态注册并打开路由,详情查看Function: TheRouterManager.lazyRegisterRouterHandle Clouse回调",["qrResultCallBack": wrapper]))
         case 4:
-            TheRouter.openURL("scheme://router/demo1?id=2&value=3&name=AKyS&desc=安全检查是指为了垮模块进行调用，我们统一使用了实现CustomRouterInfo协议的抽象类来管理路由的path与class映射关系，在注册之后，runtime动态注册与抽象类的数据结构映射是否正确，具体实现：TheRouterManager.routerForceRecheck方法中")
+            TheRouter.openURL("scheme://router/baseB?id=2&value=3&name=AKyS&desc=安全检查是指为了垮模块进行调用，我们统一使用了实现CustomRouterInfo协议的抽象类来管理路由的path与class映射关系，在注册之后，runtime动态注册与抽象类的数据结构映射是否正确，具体实现：TheRouterManager.routerForceRecheck方法中")
         case 5:
             
             let clouse = { (qrResult: String, qrStatus: Bool) in
@@ -144,6 +160,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         case 6:
             TheRouter.openURL(TheRouterBApi().requiredURL)
         case 7:
+            
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo2?id=2&value=3&name=AKyS&desc=这是一个OC类的界面，实现路由的跳转需要继承OC类，并实现TheRouterAble协议即可", ["model": model]))
         case 8:
@@ -160,10 +177,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func openRouter(indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            //            TheRouter.openURL("scheme://router/demo")
-            //            TheRouter.openURL(TheRouterApi().requiredURL)
-            //            TheRouter.openURL(TheRouterC3Api().requiredURL)
-            TheRouter.openURL(TheRouterLAApi().requiredURL)
+//            TheRouter.openURL(TheRouterLAApi().requiredURL)
+            TheRouter.openURL("scheme://router/class_prex_test?value=3&name=AKyS")
+        
         case 1:
             TheRouter.openURL("scheme://router/demo?id=2&value=3&name=AKyS")
         case 2:
@@ -205,6 +221,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         case 8:
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demoE3?id=2&value=3&name=AKyS", ["model": model]))
+        case 9:
+            TheRouter.openURL("scheme://router/baseB")
         default:
             break
         }

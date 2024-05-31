@@ -82,14 +82,4 @@ extension TheRouterWebController: TheRouterable {
         ["scheme://webview/home"]
     }
     
-    static func registerAction(info: [String : Any]) -> Any {
-        let webVC = TheRouterWebController()
-        webVC.baseUrl = info["url"] as? String ?? ""
-        return webVC
-    }
-    
-    static var priority: UInt {
-        TheRouterDefaultPriority
-    }
-    
 }

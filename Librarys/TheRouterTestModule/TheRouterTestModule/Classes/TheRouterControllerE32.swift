@@ -52,19 +52,9 @@ class TheRouterControllerE32: UIViewController {
 }
 
 extension TheRouterControllerE32: TheRouterable {
+    
     static var patternString: [String] {
         ["scheme://router/demoE32"]
     }
     
-    static func registerAction(info: [String : Any]) -> Any {
-        
-        let vc =  TheRouterControllerE32()
-        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
-        vc.resultLabel.text = info.description
-        return vc
-    }
-    
-    static var priority: UInt {
-        TheRouterDefaultPriority
-    }
 }

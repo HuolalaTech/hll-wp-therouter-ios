@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "TheRouterBaseViewController.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TheRouterBController : UIViewController
+@interface TheRouterBController : TheRouterBaseViewController
+
+@property (nonatomic, copy) QRResultBlock resultBlock;
 
 @property (nonatomic, strong) UILabel *desLabel;
 @end

@@ -8,7 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+
+
 NS_ASSUME_NONNULL_BEGIN
+
+// 定义Block类型
+typedef void (^QRResultBlock)(NSString *qrResult, BOOL qrStatus);
+
 
 @interface TheRouterBaseViewController : UIViewController
 

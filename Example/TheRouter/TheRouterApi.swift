@@ -23,11 +23,22 @@ public class TheRouterApi: NSObject, CustomRouterInfo {
     public override init() {}
 }
 
+public class TheRouterTabApi: NSObject, CustomRouterInfo {
+    
+    public static var patternString = "scheme://router/tabbar"
+    public static var routerClass = "TheRouterTabBarController"
+    public var params: [String: Any] { return [:] }
+    public var jumpType: LAJumpType = .showTab
+    
+    public override init() {}
+}
+
+
 public class TheRouterAApi: NSObject, CustomRouterInfo {
     
     public static var patternString = "scheme://router/demo1"
     public static var routerClass = "TheRouter_Example.TheRouterControllerA"
-    public var params: [String: Any] { return [:] }
+    public var params: [String: Any] { return ["dynamic": "value is dynamic"] }
     public var jumpType: LAJumpType = .push
     
     public override init() {}
@@ -448,9 +459,9 @@ public class TheRouterE34Api:NSObject, CustomRouterInfo {
 public class TheRouterLAApi:NSObject, CustomRouterInfo {
     
     public static var patternString = "scheme://router/class_prex_test"
-    public static var routerClass = "TheRouter_Example.LARouterController"
+    public static var routerClass = "TheRouter_Example.LARouterPresentController"
     public var params: [String: Any] { return [:] }
-    public var jumpType: LAJumpType = .push
+    public var jumpType: LAJumpType = .modal
     
     public override init() {}
 }
