@@ -62,7 +62,7 @@
 - (ReturnStruct)setPropertyParameter:(NSDictionary*)propertyParameter{
     // 创建可变字典，以便进行修改
     NSMutableDictionary *filteredDictionary = [propertyParameter mutableCopy];
-
+    
     // 移除指定的键
     [filteredDictionary removeObjectsForKeys:[TheRouterDynamicParamsMapping router].filterKey];
     return [self transferRouterObject:self setPropertyParameter:filteredDictionary methodSelect:nil   parameter:nil];

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import TheRouter
 
 @objcMembers
 public class TheRouerBridge: NSObject {

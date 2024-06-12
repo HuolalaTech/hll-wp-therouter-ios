@@ -16,7 +16,7 @@ public typealias QrScanResultCallBack = (_ qrResult: String, _ isSucess: Bool) -
 class TheRouterController: UIViewController {
 
     // 扫码完成回调
-    public var qrResultCallBack: QrScanResultCallBack?
+   @objc public var qrResultCallBack: TheRouerParamsClosureWrapper?
     
     private lazy var resultLabel: UILabel = {
         let lb = UILabel()
@@ -40,8 +40,8 @@ class TheRouterController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             
-            guard let _resultCallBack = self.qrResultCallBack else { return }
-            _resultCallBack("扫码回调了", false)
+            guard let _resultCallBack = self.qrResultCallBack?.closure else { return }
+            _resultCallBack(("扫码回调了", false))
         }
         // Do any additional setup after loading the view, typically from a nib.
     }

@@ -16,8 +16,7 @@ import SnapKit
 class TheRouterControllerA: UIViewController {
 
     // 扫码完成回调
-    public var qrResultCallBack: ClosureWrapper1?
-
+    @objc public var qrResultCallBack: TheRouerParamsClosureWrapper?
 
     private lazy var resultLabel: UILabel = {
         let lb = UILabel()
@@ -43,7 +42,7 @@ class TheRouterControllerA: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             
             guard let _resultCallBack = self.qrResultCallBack?.closure else { return }
-            _resultCallBack("扫码回调了", false)
+            _resultCallBack(["扫码回调了":"1"])
         }
         // Do any additional setup after loading the view, typically from a nib.
     }

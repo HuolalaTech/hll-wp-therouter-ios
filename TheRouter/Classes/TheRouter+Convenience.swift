@@ -32,7 +32,7 @@ public extension TheRouter {
     class func addRouterItem(patternString: String, priority: uint = 0, classString: String) {
        
         let clz: AnyClass? = classString.trimmingCharacters(in: CharacterSet.whitespaces).la_matchClass()
-        if let routerable = clz as? TheRouterable.Type {
+        if let _ = clz as? TheRouterable.Type {
             self.addRouterItem(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString: classString, priority: priority)
         } else {
             if let currentCls = clz, currentCls.self.conforms(to: TheRouterableProxy.self) {

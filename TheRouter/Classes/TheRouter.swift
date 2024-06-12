@@ -7,25 +7,16 @@
 
 import Foundation
 
-// 定义一个用于封装Swift闭包的类
-@objc public class ClosureWrapper: NSObject {
-   public var closure: (() -> Void)?
-
-    public init(closure: @escaping () -> Void) {
-        self.closure = closure
-    }
-}
-
 // 定义一个封装类来存储和执行接受参数的闭包
-@objc public class ClosureWrapper1: NSObject {
-    public var closure: ((String, Bool) -> Void)?
+public class TheRouerParamsClosureWrapper: NSObject {
+    public var closure: ((Any) -> Void)?
 
-    public init(closure: @escaping (String, Bool) -> Void) {
+    public init(closure: @escaping (Any) -> Void) {
         self.closure = closure
     }
 
-    public func executeClosure(qrResult: String, qrStatus: Bool) {
-        closure?(qrResult, qrStatus)
+    public func executeClosure(params: Any) {
+        closure?(params)
     }
 }
 
