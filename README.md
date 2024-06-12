@@ -25,7 +25,7 @@ iOS | [Android](https://github.com/HuolalaTech/hll-wp-therouter-android) | [中�
 * **10. 增加异步获取符合条件注册类**：遍历工程实现路由协议的类，并提前存储；
 * **11. 增加路由本地缓存能力**：每次重启应用，需要重新走注册流程，增加根据版本号进行本地缓存能力，避免初次注册;
 * **12. 自定义跳转逻辑实现**：解决类似RDVTabBarControlle也没有继承UITabbarController，导航栈也不同，那么就需要自己实现各种跳转逻辑;
-
+* **13. 支持自动参数映射**：使用setValue:forKey动态根据参数对实例类进行赋值，无需手动赋值。支持闭包，可选型(需声明@objc);
 
 
 | 功能序号 | 功能描述 | 事例代码及注释 |
@@ -139,7 +139,7 @@ TheRouteriOS讲解视频：<https://www.bilibili.com/video/BV1px4y1Y7mX>
 Add the following entry in your Podfile:
 
 ```ruby
-   pod 'TheRouter', '1.1.6'
+   pod 'TheRouter', '1.1.8'
 ```
 
 ## Swift限制版本
@@ -200,19 +200,6 @@ extension TheRouterController: TheRouterable {
     
     static var patternString: [String] {
         ["scheme://router/demo"]
-    }
-    
-    static func registerAction(info: [String : Any]) -> Any {
-        debugPrint(info)
-        
-        let vc =  TheRouterController()
-        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
-        vc.resultLabel.text = info.description
-        return vc
-    }
-
-    static var priority: UInt {
-        TheRouterDefaultPriority
     }
 }
 ```
@@ -319,14 +306,13 @@ TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调�
 ```
 
 #### 2.参数传递方式
+为了同时支持OC与Swift，这里使用了包装类进行闭包的传递 TheRouerParamsClosureWrapper。
 
 ```Swift
-let clouse = { (qrResult: String, qrStatus: Bool) in
-    print("\(qrResult) \(qrStatus)")
-    self.view.makeToast("\(qrResult) \(qrStatus)")
+let wrapper = TheRouerParamsClosureWrapper { params in
+    print("Received params: \(params)")
 }
-let model = TheRouterModel.init(name: "AKyS", age: 18)
-TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS", ["model": model, "clouse": clouse]))
+TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册字典形式，动态注册TheRouterManager.addGloableRouter，懒加载动态注册 TheRouter.lazyRegisterRouterHandle ",["qrResultCallBack": wrapper]))
 ```
 #### 3. 使用实现了CustomRouterInfo协议的对象进行传递
 
@@ -379,14 +365,14 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
 
 ### 如何让 OC 类也享受到 Swift 路由
 
-这是一个 OC 类的界面，实现路由的跳转需要实现 TheRouterableProxy 协议即可
+这是一个 OC 类的界面，实现路由的跳转需要实现 TheRouterableProxy 协议即可。当子类TheRouterBaseViewController实现了默认的协议后，子类只需要重写patternString方法
 
 ```Swift
-@interface TheRouterBController : UIViewController
+@interface TheRouterBController : TheRouterBaseViewController
 @property (nonatomic, strong) UILabel *desLabel;
 @end
 
-@interface TheRouterBController ()<TheRouterableProxy>
+@interface TheRouterBController ()
 
 @end
 
@@ -404,15 +390,6 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
     return @[@"scheme://router/demo2"];
 }
 
-+ (NSUInteger)priority {
-    return TheRouterPriorityDefault;
-}
-
-+ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info {
-    TheRouterBController *vc = [[TheRouterBController alloc] init];
-    vc.desLabel.text = info.description;
-    return vc;
-}
 @end
 ```
 
@@ -426,6 +403,16 @@ TheRouter.removeRouter(TheRouterViewCApi.patternString)
 增加缓存能力，同一版本再次打开无需走初次加载流程，直接读缓存注册，提升效率。
 考虑到开发中同一个版本下会有新增路由情况，那么从缓存读取就是不正确的，导致无法跳转。我们做了逻辑优化，如果当前正在链接Xcode跑起来的应用，会默认不走缓存，仅当打出包情况下走缓存逻辑。
 
+## 支持TabBar跳转
+
+```Swift
+
+TheRouter.openURL("scheme://router/tabbar?jumpType=5&tabBarSelecIndex=1")
+
+[TheRouerBridge openURL:@"scheme://router/tabbar?jumpType=5" userInfo:@{TheRouterTabBarSelecIndex: @1} complateHandler:^(NSDictionary<NSString *,id> *  queries, UIViewController * resultVC) {
+            
+}];
+```
 ## 服务的动态注册与调用
 
 ### 如何声明服务及实现服务
@@ -533,12 +520,6 @@ public class TheRouterControllerB: TheRouterBController, TheRouterable {
     public static var patternString: [String] {
         ["scheme://router/demo2",
          "scheme://router/demo2Android"]
-    }
-
-    public static func registerAction(info: [String : Any]) -> Any {
-        let vc =  TheRouterBController()
-        vc.desLabel.text = info.description
-        return vc
     }
 }
 ```
@@ -672,15 +653,6 @@ extension TheRouterController: TheRouterable {
     static var patternString: [String] {
         ["scheme://router/demo"]
     }
-    
-    static func registerAction(info: [String : Any]) -> Any {
-        debugPrint(info)
-        
-        let vc =  TheRouterController()
-        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
-        vc.resultLabel.text = info.description
-        return vc
-    }
 }
 ```
 ## 关于作者
@@ -694,5 +666,3 @@ TheRouter 采用Apache2.0协议，详情参考[LICENSE](LICENSE)
 ## 交流沟通群
  鉴于群二维码一周就过期，直接添加个人微信，备注来意直接拉群里。
 <img src="assets/IMG_7130.JPG">
-
-<img src="assets/chat_group.JPG">
