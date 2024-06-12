@@ -13,10 +13,12 @@ import SnapKit
 
 public typealias QrScanResultCallBack = (_ qrResult: String, _ isSucess: Bool) -> Void
 
-class TheRouterController: UIViewController {
+class TheRouterController: TheRouterBaseControllerSwift {
 
     // 扫码完成回调
    @objc public var qrResultCallBack: TheRouerParamsClosureWrapper?
+    
+   @objc public var desc: String = ""
     
     private lazy var resultLabel: UILabel = {
         let lb = UILabel()
@@ -37,6 +39,8 @@ class TheRouterController: UIViewController {
             make.height.equalTo(200)
             make.center.equalTo(self.view.center)
         }
+        
+        self.resultLabel.text = self.desc
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             

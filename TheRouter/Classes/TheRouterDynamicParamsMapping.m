@@ -14,13 +14,12 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         router = [[TheRouterDynamicParamsMapping alloc] init];
-        router.filterKey = @[@"requestURLKey", @"jumpType"];
+        router.filterKey = @[@"requestURLKey", @"jumpType", @"tabBarSelecIndex"];
     });
     return router;
 }
 /**
- 初始化 类。可直接通过NSClassFromString 获取。在这里为保持陆游的美观。才写上
- 
+ 初始化 类。可直接通过NSClassFromString 获取。在这里为保持路由的美观
  @param className 类字符串名字
  @return 返回类对象
  */
@@ -202,7 +201,9 @@
                 if ([instanceCtrl respondsToSelector:setterSelector]) {
                     [instanceCtrl setValue:obj forKey:key];
                 } else {
+#ifdef DEBUG
                     NSLog(@"⚠️⚠️ ⚠️  Warning: %@ does not respond to setter for key '%@'", instanceCtrl, key);
+#endif
                 }
             }];
             

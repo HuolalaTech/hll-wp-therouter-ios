@@ -33,7 +33,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                          "传递model模型跳转",
                                          "打开web界面",
                                          "打开路由回调方式",
-                                         "组件打开方式",
                                          "tabbar跳转"],
                                         ["路由重定向能力",
                                          "重定向移除",
@@ -210,10 +209,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 debugPrint("\(param ?? [:]) \(instance ?? "")")
             }
         case 8:
-            let model = TheRouterModel.init(name: "AKyS", age: 18)
-            TheRouter.openURL(("scheme://router/demoE3?id=2&value=3&name=AKyS", ["model": model]))
-        case 9:
-            TheRouter.openURL("scheme://router/baseB")
+            TheRouter.openURL("scheme://router/tabbar?jumpType=5&tabBarSelecIndex=1")
         default:
             break
         }

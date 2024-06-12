@@ -9,7 +9,7 @@
 import Foundation
 import TheRouter
 
-class AnyPrifxClassTestController: UIViewController, TheRouterable {
+class AnyPrifxClassTestController: TheRouterBaseControllerSwift, TheRouterable {
     
     override func viewDidLoad() {
         super.viewDidLoad()

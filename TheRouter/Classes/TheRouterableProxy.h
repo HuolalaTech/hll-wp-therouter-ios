@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 使用类方法替代静态属性
 + (NSArray<NSString *> *)patternString;
 
+@optional
 + (NSUInteger)priority;
 
 @end

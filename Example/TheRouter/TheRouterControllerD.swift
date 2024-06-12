@@ -11,10 +11,12 @@ import UIKit
 import TheRouter
 import SnapKit
 
-class TheRouterControllerD: UIViewController {
+class TheRouterControllerD: TheRouterBaseControllerSwift {
 
     // 扫码完成回调
     @objc public var qrResultCallBack: TheRouerParamsClosureWrapper?
+    
+    @objc public var desc: String = ""
     
     private lazy var resultLabel: UILabel = {
         let lb = UILabel()
@@ -36,6 +38,8 @@ class TheRouterControllerD: UIViewController {
             make.center.equalTo(self.view.center)
         }
         
+        self.resultLabel.text = self.desc
+
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             
             guard let _resultCallBack = self.qrResultCallBack?.closure  else { return }

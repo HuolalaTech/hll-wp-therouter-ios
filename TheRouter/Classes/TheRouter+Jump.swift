@@ -63,7 +63,7 @@ extension TheRouter {
         let response = TheRouter.requestURL(uriTuple.0, userInfo: uriTuple.1)
         let queries = response.queries
         var resultJumpType: LAJumpType = .push
-
+        
         if let typeString = queries[LAJumpTypeKey] as? String,
            let jumpType = LAJumpType.init(rawValue: Int(typeString) ?? 1) {
             resultJumpType = jumpType
@@ -71,8 +71,8 @@ extension TheRouter {
             resultJumpType = .push
         }
         
-        let instanceVC = TheRouterDynamicParamsMapping().routerGetInstance(withClassName: response.pattern?.classString) as? NSObject
-
+        let instanceVC = TheRouterDynamicParamsMapping.router().routerGetInstance(withClassName: response.pattern?.classString) as? NSObject
+        
         instanceVC?.setPropertyParameter(queries)
         
         
@@ -81,7 +81,7 @@ extension TheRouter {
         if let vc = instanceVC as? UIViewController {
             resultVC = vc
         }
-     
+        
         
         if let jumpVC = resultVC {
             jump(jumpType: resultJumpType, vc: jumpVC, queries: queries)

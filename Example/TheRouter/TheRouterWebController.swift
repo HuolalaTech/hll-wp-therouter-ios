@@ -10,17 +10,17 @@ import UIKit
 import WebKit
 import TheRouter
 
-class TheRouterWebController: UIViewController {
+class TheRouterWebController: TheRouterBaseControllerSwift {
     
     var webView: WKWebView?
     
-    var baseUrl: String = ""
+    @objc var url: String = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.title = "WKWebView"
         self.initWebView()
-        self.loadWebView(baseURL: self.baseUrl)
+        self.loadWebView(baseURL: self.url)
     }
     
     private func initWebView() {

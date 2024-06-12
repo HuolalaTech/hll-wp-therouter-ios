@@ -17,6 +17,8 @@ class TheRouterControllerA: UIViewController {
 
     // 扫码完成回调
     @objc public var qrResultCallBack: TheRouerParamsClosureWrapper?
+    
+    @objc var desc: String = ""
 
     private lazy var resultLabel: UILabel = {
         let lb = UILabel()
@@ -38,6 +40,7 @@ class TheRouterControllerA: UIViewController {
             make.center.equalTo(self.view.center)
         }
         
+        self.resultLabel.text = self.desc
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             
