@@ -11,10 +11,12 @@ import UIKit
 import TheRouter
 import SnapKit
 
-class TheRouterControllerC: UIViewController {
+class TheRouterControllerC: TheRouterBaseControllerSwift {
 
     // 扫码完成回调
-    public var qrResultCallBack: QrScanResultCallBack?
+    @objc public var qrResultCallBack: TheRouerParamsClosureWrapper?
+    
+    @objc public var desc: String = ""
     
     private lazy var resultLabel: UILabel = {
         let lb = UILabel()
@@ -36,10 +38,12 @@ class TheRouterControllerC: UIViewController {
             make.center.equalTo(self.view.center)
         }
         
+        self.resultLabel.text = self.desc
+
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             
-            guard let _resultCallBack = self.qrResultCallBack else { return }
-            _resultCallBack("扫码回调了", false)
+            guard let _resultCallBack = self.qrResultCallBack?.closure  else { return }
+            _resultCallBack(("扫码回调了", false))
         }
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -56,18 +60,5 @@ extension TheRouterControllerC: TheRouterable {
     static var patternString: [String] {
         ["scheme://router/demo3",
          "scheme://router/demo33"]
-    }
-    
-    static func registerAction(info: [String : Any]) -> Any {
-        debugPrint(info)
-        
-        let vc =  TheRouterControllerC()
-        vc.qrResultCallBack = info["clouse"] as? QrScanResultCallBack
-        vc.resultLabel.text = info.description
-        return vc
-    }
-    
-    static var priority: UInt {
-        TheRouterDefaultPriority
     }
 }

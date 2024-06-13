@@ -56,31 +56,35 @@ extension TheRouter {
             return routerJump(uriTuple, complateHandler: complateHandler)
         }
     }
-
+    
     // 路由跳转
     public class func routerJump(_ uriTuple: (String, [String: Any]), complateHandler: ComplateHandler = nil) -> Any? {
         
         let response = TheRouter.requestURL(uriTuple.0, userInfo: uriTuple.1)
-        let instance = response.pattern?.handle(response.queries)
         let queries = response.queries
-        
         var resultJumpType: LAJumpType = .push
         
-        var resultVC: UIViewController?
-        
-        if let vc = instance as? UIViewController {
-            resultVC = vc
-        }
         if let typeString = queries[LAJumpTypeKey] as? String,
            let jumpType = LAJumpType.init(rawValue: Int(typeString) ?? 1) {
             resultJumpType = jumpType
         } else {
             resultJumpType = .push
         }
-            
+        
+        let instanceVC = TheRouterDynamicParamsMapping.router().routerGetInstance(withClassName: response.pattern?.classString) as? NSObject
+        
+        instanceVC?.setPropertyParameter(queries)
+        
+        
+        var resultVC: UIViewController?
+        
+        if let vc = instanceVC as? UIViewController {
+            resultVC = vc
+        }
+        
         
         if let jumpVC = resultVC {
-            jump(jumpType: resultJumpType, vc: jumpVC)
+            jump(jumpType: resultJumpType, vc: jumpVC, queries: queries)
             let className = NSStringFromClass(type(of: jumpVC))
             shareInstance.logcat?(uriTuple.0, .logNormal, "resultVC: \(className)")
         } else {
@@ -88,11 +92,11 @@ extension TheRouter {
         }
         
         complateHandler?(queries, resultVC)
-
+        
         return resultVC
     }
     
-    public class func jump(jumpType: LAJumpType, vc: UIViewController) {
+    public class func jump(jumpType: LAJumpType, vc: UIViewController, queries: [String: Any]) {
         DispatchQueue.main.async {
             if let action = shareInstance.customJumpAction {
                 action(jumpType, vc)
@@ -108,9 +112,29 @@ extension TheRouter {
                     pusbWindowNavRoot(vc)
                 case .modalDismissBeforePush:
                     modalDismissBeforePush(vc)
+                case .showTab:
+                    showTabBar(queries: queries)
                 }
             }
         }
+    }
+    
+    private class func showTabBar(queries: [String: Any]) {
+        let selectIndex: Int = processParameter(queries[TheRouterTabBarSelecIndex] ?? 0) ?? 0
+        let tabVC = UIApplication.shared.delegate?.window??.rootViewController
+        if let tabVC = tabVC as? UITabBarController {
+            let navVC: UINavigationController? = la_getTopViewController(nil)?.navigationController
+            if let navigationController = navVC {
+                navigationController.popToRootViewController(animated: false)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    tabVC.selectedIndex = selectIndex
+                    if let topViewController = la_getTopViewController(nil), let navController = topViewController.navigationController {
+                        navController.popToRootViewController(animated: false)
+                    }
+                }
+            }
+        }
+        
     }
     // 服务调用
     public class func routerService(_ uriTuple: (String, [String: Any])) -> Any? {
@@ -433,6 +457,16 @@ extension TheRouter {
             
         default:
             return topVC.presentedViewController ?? topVC
+        }
+    }
+    
+    class func processParameter(_ parameter: Any) -> Int? {
+        if let intValue = parameter as? Int {
+            return intValue
+        } else if let stringValue = parameter as? String, let intValue = Int(stringValue) {
+            return intValue
+        } else {
+            return 0
         }
     }
     

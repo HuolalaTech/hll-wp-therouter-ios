@@ -20,10 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 // 使用类方法替代静态属性
 + (NSArray<NSString *> *)patternString;
 
+@optional
 + (NSUInteger)priority;
 
-// 静态方法可以直接转换为类方法
-+ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info;
 @end
 
 NS_ASSUME_NONNULL_END

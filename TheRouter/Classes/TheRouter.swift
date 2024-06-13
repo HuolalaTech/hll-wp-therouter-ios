@@ -7,6 +7,19 @@
 
 import Foundation
 
+// 定义一个封装类来存储和执行接受参数的闭包
+public class TheRouerParamsClosureWrapper: NSObject {
+    public var closure: ((Any) -> Void)?
+
+    public init(closure: @escaping (Any) -> Void) {
+        self.closure = closure
+    }
+
+    public func executeClosure(params: Any) {
+        closure?(params)
+    }
+}
+
 public class TheRouter: TheRouterParser {
     
     // MARK: - Constants
@@ -48,10 +61,10 @@ public class TheRouter: TheRouterParser {
     
     // MARK: - Public method
     func addRouterItem(_ patternString: String,
-                       priority: uint = 0,
-                       handle: @escaping TheRouterPattern.HandleBlock) {
+                       classString: String,
+                       priority: uint = 0) {
         
-        let pattern = TheRouterPattern.init(patternString.trimmingCharacters(in: CharacterSet.whitespaces), priority: priority, handle: handle)
+        let pattern = TheRouterPattern.init(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString, priority: priority)
         patterns.append(pattern)
         patterns.sort { $0.priority > $1.priority }
     }

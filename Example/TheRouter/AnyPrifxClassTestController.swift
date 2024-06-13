@@ -9,7 +9,7 @@
 import Foundation
 import TheRouter
 
-class AnyPrifxClassTestController: UIViewController, TheRouterable {
+class AnyPrifxClassTestController: TheRouterBaseControllerSwift, TheRouterable {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,14 +18,5 @@ class AnyPrifxClassTestController: UIViewController, TheRouterable {
 
     public static var patternString: [String] {
         ["scheme://router/anyClass_prex_test"]
-    }
-    
-    public static func registerAction(info: [String : Any]) -> Any {
-        let vc =  AnyPrifxClassTestController()
-        return vc
-    }
-    
-    public static var priority: UInt {
-        TheRouterDefaultPriority
     }
 }
