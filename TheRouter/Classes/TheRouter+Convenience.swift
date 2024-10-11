@@ -29,14 +29,14 @@ public extension TheRouter {
     /// - Parameters:
     ///   - patternString: register urlstring
     ///   - classString: the class which match the className need inherit the protocol of TheRouterable
-    class func addRouterItem(patternString: String, priority: uint = 0, classString: String) {
+    class func addRouterItem(_ patternString: String, priority: uint = 0, classString: String) {
        
         let clz: AnyClass? = classString.trimmingCharacters(in: CharacterSet.whitespaces).la_matchClass()
-        if let _ = clz as? TheRouterable.Type {
-            self.addRouterItem(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString: classString, priority: priority)
+        if let routerable = clz as? TheRouterable.Type {
+            self.addRouterItem(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString: classString, priority: priority, handle: routerable.registerAction)
         } else {
             if let currentCls = clz, currentCls.self.conforms(to: TheRouterableProxy.self) {
-                self.addRouterItem(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString: classString, priority: priority)
+                self.addRouterItem(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString: classString, priority: priority, handle: currentCls.registerAction)
             } else {
                 shareInstance.logcat?(patternString, .logError, "\(classString) register router error， please implementation the TheRouterable Protocol")
                 assert(clz as? TheRouterable.Type != nil, "register router error， please implementation the TheRouterable Protocol")
@@ -50,8 +50,8 @@ public extension TheRouter {
     ///   - patternString: register urlstring
     ///   - priority: match priority, sort by inverse order
     ///   - handle: block of refister URL
-    class func addRouterItem(_ patternString: String, classString: String, priority: uint = 0) {
-        shareInstance.addRouterItem(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString: classString, priority: priority)
+    class func addRouterItem(_ patternString: String, classString: String, priority: uint = 0, handle: @escaping TheRouterPattern.HandleBlock) {
+        shareInstance.addRouterItem(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString: classString, priority: priority, handle: handle)
     }
     
     /// addRouterItem

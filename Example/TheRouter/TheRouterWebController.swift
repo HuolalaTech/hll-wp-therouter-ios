@@ -14,14 +14,14 @@ class TheRouterWebController: TheRouterBaseControllerSwift {
     
     var webView: WKWebView?
     
-    @objc var url: String = ""
+    var baseUrl: String = ""
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-        self.navigationItem.title = "WKWebView"
-        self.initWebView()
-        self.loadWebView(baseURL: self.url)
-    }
+         super.viewDidLoad()
+         self.navigationItem.title = "WKWebView"
+         self.initWebView()
+         self.loadWebView(baseURL: self.baseUrl)
+     }
     
     private func initWebView() {
         let preferences = WKPreferences()
@@ -38,13 +38,12 @@ class TheRouterWebController: TheRouterBaseControllerSwift {
     }
     
     private func loadWebView(baseURL: String?) {
-        guard let baseURL = baseURL else { return }
-        let url = URL(string: baseURL)!
-        let request = URLRequest(url: url)
-        self.webView?.load(request)
-    }
-    
-
+         guard let baseURL = baseURL else { return }
+         let url = URL(string: baseURL)!
+         let request = URLRequest(url: url)
+         self.webView?.load(request)
+     }
+     
 }
 
 
@@ -82,4 +81,9 @@ extension TheRouterWebController: TheRouterable {
         ["scheme://webview/home"]
     }
     
+    static func registerAction(info: [String : Any]) -> Any {
+         let webVC = TheRouterWebController()
+         webVC.baseUrl = info["url"] as? String ?? ""
+         return webVC
+     }
 }

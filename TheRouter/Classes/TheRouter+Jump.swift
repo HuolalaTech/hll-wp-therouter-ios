@@ -16,6 +16,7 @@ extension TheRouter {
         if urlString.isEmpty {
             return nil
         }
+        
         if !shareInstance.routerLoaded {
             return shareInstance.lazyRegisterHandleBlock?(urlString, userInfo)
         } else {
@@ -61,8 +62,18 @@ extension TheRouter {
     public class func routerJump(_ uriTuple: (String, [String: Any]), complateHandler: ComplateHandler = nil) -> Any? {
         
         let response = TheRouter.requestURL(uriTuple.0, userInfo: uriTuple.1)
+        let instance = response.pattern?.handle(response.queries)
         let queries = response.queries
         var resultJumpType: LAJumpType = .push
+        
+        var instanceVC = instance as? NSObject
+        if let ins = instanceVC {
+            ins.setPropertyParameter(queries)
+        } else {
+            instanceVC = TheRouterDynamicParamsMapping().routerGetInstance(withClassName: response.pattern?.classString) as? NSObject
+            instanceVC?.setPropertyParameter(queries)
+        }
+        
         
         if let typeString = queries[LAJumpTypeKey] as? String,
            let jumpType = LAJumpType.init(rawValue: Int(typeString) ?? 1) {
@@ -70,11 +81,6 @@ extension TheRouter {
         } else {
             resultJumpType = .push
         }
-        
-        let instanceVC = TheRouterDynamicParamsMapping.router().routerGetInstance(withClassName: response.pattern?.classString) as? NSObject
-        
-        instanceVC?.setPropertyParameter(queries)
-        
         
         var resultVC: UIViewController?
         

@@ -19,4 +19,11 @@ class AnyPrifxClassTestController: TheRouterBaseControllerSwift, TheRouterable {
     public static var patternString: [String] {
         ["scheme://router/anyClass_prex_test"]
     }
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        debugPrint(info)
+        
+        let vc = AnyPrifxClassTestController()
+        return vc
+    }
 }

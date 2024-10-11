@@ -45,4 +45,10 @@
     return TheRouterPriorityDefault;
 }
 
++ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info {
+    TheRouterTabBarController *vc = self.class.new;
+    return vc;
+}
+
+
 @end

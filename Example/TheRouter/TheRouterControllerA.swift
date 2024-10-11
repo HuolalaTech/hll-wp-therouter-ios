@@ -62,4 +62,13 @@ extension TheRouterControllerA: TheRouterable {
     static var patternString: [String] {
         ["scheme://router/demo1"]
     }
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        debugPrint(info)
+        
+        let vc =  TheRouterControllerA()
+        vc.qrResultCallBack = info["clouse"] as? TheRouerParamsClosureWrapper
+        vc.resultLabel.text = info.description
+        return vc
+    }
 }

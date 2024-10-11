@@ -50,4 +50,11 @@ class LARouterPresentController: UIViewController, TheRouterable {
         ["scheme://router/class_prex_test"]
     }
 
+    
+    static func registerAction(info: [String : Any]) -> Any {
+        debugPrint(info)
+        
+        let vc =  LARouterPresentController()
+        return vc
+    }
 }

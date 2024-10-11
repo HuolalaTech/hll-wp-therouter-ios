@@ -127,17 +127,21 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                      "scheme://router/demo1": "TheRouter_Example.TheRouterControllerA"])
             let wrapper = TheRouerParamsClosureWrapper { params in
                 print("Received params: \(params)")
+                self.view .makeToast("\(params)")
             }
             TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=直接调用TheRouter.addRouterItem()注册即可，支持单个注册，批量注册字典形式，动态注册TheRouterManager.addGloableRouter，懒加载动态注册 TheRouter.lazyRegisterRouterHandle ",["qrResultCallBack": wrapper]))
             
         case 2:
             let wrapper = TheRouerParamsClosureWrapper { params in
                 print("Received params: \(params)")
+                self.view .makeToast("\(params)")
+
             }
             TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=动态注册使用runtime遍历工程类，将路由path与对应的class映射进行存储，进行跳转时，映射解析跳转详情查看Function: TheRouterManager.addGloableRouter",["qrResultCallBack": wrapper]))
         case 3:
             let wrapper = TheRouerParamsClosureWrapper { params in
                 print("Received params: \(params)")
+                self.view .makeToast("\(params)")
             }
             TheRouter.openURL(("scheme://router/demo1?id=2&value=3&name=AKyS&desc=懒加载的动态注册是在动态注册的基础上，为了解决App初始化就遍历解析的性能问题，只有当用户第一次使用路由打开界面或服务时，才进行动态注册并打开路由,详情查看Function: TheRouterManager.lazyRegisterRouterHandle Clouse回调",["qrResultCallBack": wrapper]))
         case 4:
@@ -146,6 +150,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             
             let wrapper = TheRouerParamsClosureWrapper { params in
                 print("Received params: \(params)")
+                self.view .makeToast("\(params)")
             }
             let model = TheRouterModel.init(name: "AKyS", age: 18)
             TheRouter.openURL(("scheme://router/demo?id=2&value=3&name=AKyS&desc=通过TheRouterManager.addGloableRouter()传入registerClassPrifxArray参数，将指定遍历工程中具有特性前缀名的class，降低遍历数量级，减少性能损耗", ["model": model, "qrResultCallBack": wrapper]))

@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 + (NSUInteger)priority;
 
+// 静态方法可以直接转换为类方法
++ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info;
 @end
 
 NS_ASSUME_NONNULL_END

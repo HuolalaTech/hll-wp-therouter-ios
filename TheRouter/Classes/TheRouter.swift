@@ -62,9 +62,10 @@ public class TheRouter: TheRouterParser {
     // MARK: - Public method
     func addRouterItem(_ patternString: String,
                        classString: String,
-                       priority: uint = 0) {
+                       priority: uint = 0,
+                       handle: @escaping TheRouterPattern.HandleBlock) {
         
-        let pattern = TheRouterPattern.init(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString, priority: priority)
+        let pattern = TheRouterPattern.init(patternString.trimmingCharacters(in: CharacterSet.whitespaces), classString, priority: priority, handle: handle)
         patterns.append(pattern)
         patterns.sort { $0.priority > $1.priority }
     }

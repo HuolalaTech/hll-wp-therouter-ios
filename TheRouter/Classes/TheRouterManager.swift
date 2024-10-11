@@ -84,7 +84,7 @@ extension TheRouterManager {
             if let number = UInt32(item[TheRouterPriority] ?? "0") {
                 priority = number
             }
-            TheRouter.addRouterItem(patternString: item[TheRouterPath] ?? "", priority: priority, classString: item[TheRouterClassName] ?? "")
+            TheRouter.addRouterItem(item[TheRouterPath] ?? "", priority: priority, classString: item[TheRouterClassName] ?? "")
         }
         let endRegisterTime = CFAbsoluteTimeGetCurrent()
         TheRouter.routerLoadStatus(true)

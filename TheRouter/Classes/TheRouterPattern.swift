@@ -9,6 +9,8 @@ import Foundation
 
 public class TheRouterPattern: TheRouterParser {
     
+    public typealias HandleBlock = ([String: Any]) -> Any?
+
     public static let PatternPlaceHolder = "~LA~"
     
     public var patternString: String
@@ -18,10 +20,12 @@ public class TheRouterPattern: TheRouterParser {
     public var matchString: String
     public var classString: String
     public var paramsMatchDict: [String: Int]
-    
+    public var handle: HandleBlock
+
     public init(_ string: String,
                 _ classString: String,
-                priority: uint = 0) {
+                priority: uint = 0,
+                handle: @escaping HandleBlock) {
         
         self.patternString = string
         self.priority = priority
@@ -29,6 +33,8 @@ public class TheRouterPattern: TheRouterParser {
         self.patternPaths = TheRouterPattern.parserPaths(string)
         self.paramsMatchDict = [String: Int]()
         self.classString = classString
+        self.handle = handle
+
         var matchPaths = [String]()
         for i in 0..<patternPaths.count {
             var pathComponent = self.patternPaths[i]

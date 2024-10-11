@@ -29,4 +29,10 @@
     return TheRouterPriorityDefault;
 }
 
++ (id)registerActionWithInfo:(NSDictionary<NSString *, id> *)info {
+    TheRouterBaseViewController *vc = self.class.new;
+    vc.params = info;
+    return vc;
+}
+
 @end
