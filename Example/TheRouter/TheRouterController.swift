@@ -39,9 +39,7 @@ class TheRouterController: TheRouterBaseControllerSwift {
             make.height.equalTo(200)
             make.center.equalTo(self.view.center)
         }
-        
-        self.resultLabel.text = self.desc
-        
+                
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             
             guard let _resultCallBack = self.qrResultCallBack?.closure else { return }

@@ -24,7 +24,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                          "OC类路由的动态注册实现",
                                          "OC类路由包含基类的主动注册实现",
                                          "动态注册中KVO派生子类处理",
-                                         "缓存跳转"],
+                                         "缓存跳转",
+                                         "是否可打开路由"],
                                         ["无参数跳转",
                                          "有参数跳转",
                                          "多参数类型跳转",
@@ -165,6 +166,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             TheRouter.openURL(("scheme://router/baseA?id=2&value=3&name=AKyS&desc=基类的路由如何被覆盖重写", ["model": model]))
         case 9:
             TheRouter.openURL("scheme://router/demo9?desc=缓存跳转")
+        case 10:
+            let canOpenURl =  TheRouter.canOpenURL("scheme://router/demo9?desc=缓存跳转")
+            self.view.makeToast(canOpenURl ? "可以打开" : "不可以打开")
         default:
             break
         }

@@ -25,6 +25,16 @@ class LARouterPresentController: UIViewController, TheRouterable {
         return btn
     }()
     
+    private lazy var resultLabel: UILabel = {
+        let lb = UILabel()
+        lb.textColor = .black
+        lb.font = UIFont.systemFont(ofSize: 15)
+        lb.textAlignment = .center
+        lb.numberOfLines = 0
+        return lb
+    }()
+
+    
     @objc
     func backButtonClick() {
         self.dismiss(animated: true) {
@@ -43,6 +53,14 @@ class LARouterPresentController: UIViewController, TheRouterable {
             make.width.height.equalTo(48)
         }
         
+        self.view.addSubview(resultLabel)
+    
+        resultLabel.snp.makeConstraints { make in
+            make.width.equalTo(300)
+            make.height.equalTo(200)
+            make.center.equalTo(self.view.center)
+        }
+        
         print("\(self.name) -- \(self.value)")
     }
 
@@ -55,6 +73,7 @@ class LARouterPresentController: UIViewController, TheRouterable {
         debugPrint(info)
         
         let vc =  LARouterPresentController()
+        vc.resultLabel.text = info.debugDescription
         return vc
     }
 }

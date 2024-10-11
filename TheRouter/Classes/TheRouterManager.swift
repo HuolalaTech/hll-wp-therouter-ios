@@ -24,6 +24,21 @@ public class TheRouterManager: NSObject {
     
     static public let shareInstance = TheRouterManager()
     
+    public struct TheRouterConfiguration {
+        //排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+        public var excludeCocoapods: Bool = false
+        // 是否进行强制教研
+        public var forceCheckEnable: Bool = false
+        // 统一将web界面定义为一个路由地址，url作为参数传递
+        public var webPath: String?
+        // 支持服务远程调用，配置服务的host
+        public var serviceHost: String = ""
+        // 是否使用缓存，建议生产环境默认开启
+        public var useCache: Bool = false
+     }
+
+    public var config = TheRouterConfiguration()
+    
     // 是否使用缓存
     public var useCache: Bool = false
     
@@ -37,21 +52,42 @@ public class TheRouterManager: NSObject {
     public static func addGloableRouter(_ excludeCocoapods: Bool = false,
                                         _ urlPath: String,
                                         _ userInfo: [String: Any],
-                                        forceCheckEnable: Bool = false) -> Any? {
+                                        _ forceCheckEnable: Bool = false, 
+                                        _ webPath: String?,
+                                        _ serviceHost: String) -> Any? {
         
         TheRouter.globalOpenFailedHandler { (info) in
             guard let matchFailedKey = info[TheRouter.matchFailedKey] as? String else { return }
             debugPrint(matchFailedKey)
             TheRouter.shareInstance.logcat?("TheRouter: globalOpenFailedHandler", .logError, "\(matchFailedKey)")
         }
-        
-        return TheRouterManager.registerRouterMap(excludeCocoapods, urlPath, userInfo, forceCheckEnable: forceCheckEnable)
+        return TheRouterManager.registerRouterMap(excludeCocoapods, urlPath, userInfo, forceCheckEnable, webPath, serviceHost)
     }
-    
-    // MARK: -注册web与服务调用
-    public static func injectRouterServiceConfig(_ webPath: String?, _ serviceHost: String) {
-        TheRouter.injectRouterServiceConfig(webPath, serviceHost)
-    }
+
+     // 新增方法来设置配置
+     public func setConfiguration(_ config: TheRouterConfiguration) {
+         self.config = config
+
+         // 路由懒加载注册,
+         // - excludeCocoapods: 是否对Cocoapods生成的组件进行动态注册
+         // - excludeCocoapods = true 不对Cocoapods生成的组件进行动态注册， false 对Cocoapods生成的组件也进行遍历动态注册
+         // - useCache: 是否开启本地缓存功能
+         TheRouterManager.loadRouterClass(excludeCocoapods: config.excludeCocoapods, useCache: config.useCache)
+
+         TheRouter.lazyRegisterRouterHandle { url, userInfo in
+             /// - Parameters:
+             ///   - excludeCocoapods: 排除一些非业务注册类，这里一般会将 "com.apple", "org.cocoapods" 进行过滤，但是如果组件化形式的，创建的BundleIdentifier也是
+             ///   org.cocoapods，这里需要手动改下，否则组件内的类将不会被获取。
+             ///   - urlPath: 将要打开的路由path
+             ///   - userInfo: 路由传递的参数
+             ///   - forceCheckEnable: 是否支持强制校验，强制校验要求Api声明与对应的类必须实现TheRouterAble协议
+             ///   - forceCheckEnable 强制打开TheRouterApi定义的便捷类与实现TheRouterAble协议类是否相同，打开的话，debug环境会自动检测，避免线上出问题，建议打开
+             return TheRouterManager.addGloableRouter(config.excludeCocoapods, url, userInfo, config.forceCheckEnable, config.webPath, config.serviceHost)
+         }
+             
+         // 动态注册服务
+         TheRouterManager.registerServices(excludeCocoapods: config.excludeCocoapods)
+     }
 }
 
 extension TheRouterManager {
@@ -72,8 +108,30 @@ extension TheRouterManager {
     public class func registerRouterMap(_ excludeCocoapods: Bool = false,
                                         _ urlPath: String,
                                         _ userInfo: [String: Any],
-                                        forceCheckEnable: Bool = false) -> Any? {
+                                        _ forceCheckEnable: Bool = false,
+                                        _ webPath: String?,
+                                        _ serviceHost: String) -> Any? {
         
+        TheRouterManager.registerRouter(excludeCocoapods, urlPath, userInfo, webPath, serviceHost)
+        
+        if forceCheckEnable {
+#if DEBUG
+           routerForceRecheck(excludeCocoapods)
+#endif
+        }
+
+        return TheRouter.openURL(urlPath, userInfo: userInfo)
+    }
+    
+    
+    public class func registerRouter(_ excludeCocoapods: Bool = false,
+                                     _ urlPath: String,
+                                     _ userInfo: [String: Any],
+                                     _ webPath: String?,
+                                     _ serviceHost: String)  {
+        
+        TheRouter.injectRouterServiceConfig(webPath, serviceHost)
+
         let beginRegisterTime = CFAbsoluteTimeGetCurrent()
         
         if registerRouterList.isEmpty {
@@ -93,13 +151,6 @@ extension TheRouterManager {
         } else {
             TheRouter.shareInstance.logcat?("未使用缓存注册路由耗时：\(endRegisterTime - beginRegisterTime)", .logNormal, "")
         }
-        if forceCheckEnable {
-#if DEBUG
-           routerForceRecheck(excludeCocoapods)
-#endif
-        }
-
-        return TheRouter.openURL(urlPath, userInfo: userInfo)
     }
     
     

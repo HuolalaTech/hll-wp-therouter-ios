@@ -102,6 +102,11 @@ public class TheRouter: TheRouterParser {
         if urlString.isEmpty {
             return false
         }
+
+        if !self.routerLoaded {
+            let config = TheRouterManager.shareInstance.config
+            TheRouterManager.registerRouter(config.excludeCocoapods, urlString, [:], config.webPath, config.serviceHost)
+        }
         return matchURL(urlString.trimmingCharacters(in: CharacterSet.whitespaces)).pattern != nil
     }
     
