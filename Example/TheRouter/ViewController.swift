@@ -33,7 +33,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                                          "传递model模型跳转",
                                          "打开web界面",
                                          "打开路由回调方式",
-                                         "tabbar跳转"],
+                                         "tabbar跳转",
+                                         "宏注册跳转"],
                                         ["路由重定向能力",
                                          "重定向移除",
                                          "路由解决本地path编写错误",
@@ -121,6 +122,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             TheRouter.addRouterItem(RouteItem(path: "scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可", className: "TheRouter_Example.TheRouterController"))
             TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController"])
             TheRouter.addRouterItem("scheme://router/demo?&desc=简单注册", classString: "TheRouter_Example.TheRouterController")
+            TheRouter.addRouterItem("scheme://router/demo-macro?&desc=Swift宏注册", classString: "TheRouter_Example.TheRouterMacroRegisterController")
             TheRouter.addRouterItem(TheRouterApi.patternString, classString: TheRouterApi.routerClass)
             TheRouter.addRouterItem(TheRouterAApi.patternString, classString: TheRouterAApi.routerClass)
             TheRouter.addRouterItem(["scheme://router/demo?&desc=简单注册,直接调用TheRouter.addRouterItem()注册即可": "TheRouter_Example.TheRouterController",
@@ -210,6 +212,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
         case 8:
             TheRouter.openURL("scheme://router/tabbar?jumpType=5&tabBarSelecIndex=1")
+        case 9:
+            TheRouter.openURL("scheme://router/demo-macro?desc=宏注册跳转")
         default:
             break
         }
