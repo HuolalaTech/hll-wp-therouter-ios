@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TheRouterMacro}",
+            "name": "Debug TheRouterMacroClient",
+            "program": "${workspaceFolder:TheRouterMacro}/.build/debug/TheRouterMacroClient",
+            "preLaunchTask": "swift: Build Debug TheRouterMacroClient"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TheRouterMacro}",
+            "name": "Release TheRouterMacroClient",
+            "program": "${workspaceFolder:TheRouterMacro}/.build/release/TheRouterMacroClient",
+            "preLaunchTask": "swift: Build Release TheRouterMacroClient"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TheRouterMacro}",
+            "name": "Debug TheRouterMacroMacros",
+            "program": "${workspaceFolder:TheRouterMacro}/.build/debug/TheRouterMacroMacros",
+            "preLaunchTask": "swift: Build Debug TheRouterMacroMacros"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:TheRouterMacro}",
+            "name": "Release TheRouterMacroMacros",
+            "program": "${workspaceFolder:TheRouterMacro}/.build/release/TheRouterMacroMacros",
+            "preLaunchTask": "swift: Build Release TheRouterMacroMacros"
+        }
+    ]
+}

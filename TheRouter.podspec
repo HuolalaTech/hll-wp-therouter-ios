@@ -25,7 +25,8 @@ TODO: Add long description of the pod here.
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'mars' => 'mars.yao' }
   s.source           = { :git => 'https://github.com/HuolalaTech/hll-wp-therouter-ios.git', :tag => s.version.to_s } 
-  s.source_files = 'TheRouter/Classes/**/*'
+  s.source_files = 'TheRouter/Classes/**/*', 'TheRouter/Classes/TheRouter/Sources/TheRouter/*'
+  s.exclude_files = 'TheRouter/Classes/TheRouterable/Package.swift'
   s.frameworks = 'UIKit', 'Foundation'
   s.ios.deployment_target = '11.0'
   # swift 支持的版本
@@ -36,5 +37,35 @@ TODO: Add long description of the pod here.
     'OTHER_SWIFT_FLAGS[config=Debug]' => '-D DEBUG'
   }
 
+  s.subspec 'TheRouterMacro' do |macro|
+    macro.source_files = 'TheRouterMacro/Sources/TheRouterMacro/*'
+    macro.preserve_paths = 'TheRouterMacro/Package.swift', 'TheRouterMacro/Sources/**/*'
+
+    product_folder = "${PODS_BUILD_DIR}/Products/TheRouterMacroMacros"
+
+    script = <<-SCRIPT.squish
+    env -i PATH="$PATH" "$SHELL" -l -c
+    "swift build -c release --product TheRouterMacroMacros
+    --package-path \\"$PODS_TARGET_SRCROOT/TheRouterMacro\\"
+    --scratch-path \\"#{product_folder}\\""
+    SCRIPT
+
+    macro.script_phase = {
+        :name => 'Build TheRouterMacroMacros macro plugin',
+        :script => script,
+        :input_files => Dir.glob("{TheRouterMacro/Package.swift,TheRouterMacro/Sources/**/*}").map {
+        |path| "$(PODS_TARGET_SRCROOT)/#{path}"
+        },
+        :output_files => ["#{product_folder}/release/TheRouterMacroMacros"],
+        :execution_position => :before_compile
+    }
+
+    macro.user_target_xcconfig = {
+        'OTHER_SWIFT_FLAGS' => <<-FLAGS.squish
+        -Xfrontend -load-plugin-executable
+        -Xfrontend #{product_folder}/release/TheRouterMacroMacros#TheRouterMacroMacros
+        FLAGS
+    }
+  end
 end
 

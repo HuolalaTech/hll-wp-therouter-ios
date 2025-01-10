@@ -5,8 +5,6 @@
 //  Created by mars.yao on 2021/9/1.
 //
 
-import UIKit
-
 
 public protocol TheRouterable {
     
@@ -19,6 +17,6 @@ public protocol TheRouterable {
 
 extension TheRouterable {
     public static var priority: UInt {
-        TheRouterDefaultPriority
+        1000
     }
 }
