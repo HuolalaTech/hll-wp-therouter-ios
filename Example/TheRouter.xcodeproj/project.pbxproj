@@ -24,6 +24,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		63A621912D27CF94005E1C5E /* TheRouterMacroRegisterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A621902D27CF94005E1C5E /* TheRouterMacroRegisterController.swift */; };
 		B4C21EFE5B0ABE82F3498107 /* Pods_TheRouter_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD1C616AE5833A562B960C6C /* Pods_TheRouter_Example.framework */; };
 		F0259EB82C19EAC60011FD8D /* TheRouterBaseControllerSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0259EB72C19EAC60011FD8D /* TheRouterBaseControllerSwift.swift */; };
 		F06A9E202C0A1B9100B4DDF8 /* TheRouterTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = F06A9E1F2C0A1B9100B4DDF8 /* TheRouterTabBarController.m */; };
@@ -70,6 +71,7 @@
 		607FACE51AFB9204008FA782 /* TheRouter_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TheRouter_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		63A621902D27CF94005E1C5E /* TheRouterMacroRegisterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TheRouterMacroRegisterController.swift; sourceTree = "<group>"; };
 		8A89F6440DC6CAA813B5264B /* Pods-TheRouter_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheRouter_Example.debug.xcconfig"; path = "Target Support Files/Pods-TheRouter_Example/Pods-TheRouter_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		A397706F487B5EF4A43510A6 /* TheRouter.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = TheRouter.podspec; path = ../TheRouter.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A743C1781FB56171B383C18A /* Pods-TheRouter_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheRouter_Example.release.xcconfig"; path = "Target Support Files/Pods-TheRouter_Example/Pods-TheRouter_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				1C839B8E2AA6F67A00726596 /* TheRouterControllerC.swift */,
 				1C839B982AA6F67A00726596 /* TheRouterControllerD.swift */,
 				1C41F0142B0DD792002E2F24 /* TheRouterControllerE.swift */,
+				63A621902D27CF94005E1C5E /* TheRouterMacroRegisterController.swift */,
 				F06A9E1E2C0A1B9100B4DDF8 /* TheRouterTabBarController.h */,
 				F06A9E1F2C0A1B9100B4DDF8 /* TheRouterTabBarController.m */,
 				1C839B8D2AA6F67A00726596 /* TheRouterModel.swift */,
@@ -411,6 +414,7 @@
 				F06A9E202C0A1B9100B4DDF8 /* TheRouterTabBarController.m in Sources */,
 				1C839BA42AA6F67A00726596 /* TheRouterBController.m in Sources */,
 				1C839B9D2AA6F67A00726596 /* TheRouterApi.swift in Sources */,
+				63A621912D27CF94005E1C5E /* TheRouterMacroRegisterController.swift in Sources */,
 				1C839B9E2AA6F67A00726596 /* TheRouterWebController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
